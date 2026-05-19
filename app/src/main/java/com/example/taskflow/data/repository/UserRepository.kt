@@ -2,19 +2,21 @@ package com.example.taskflow.data.repository
 
 import com.example.taskflow.data.local.dao.UserDao
 import com.example.taskflow.data.local.entity.UserEntity
+import com.example.taskflow.data.remote.dto.LoginRequest
+import com.example.taskflow.data.remote.retrofit.RetrofitClient
 
 class UserRepository(
     private val userDao: UserDao
 ) {
 
-    // Register
+    // Register local
     suspend fun registerUser(
         user: UserEntity
     ): Long {
         return userDao.insertUser(user)
     }
 
-    // Login
+    // Login local trước (offline-first)
     suspend fun login(
         email: String,
         password: String
@@ -25,7 +27,33 @@ class UserRepository(
         )
     }
 
-    // Check email
+    // Login API (online)
+    suspend fun loginFromApi(
+        email: String,
+        password: String
+    ): UserEntity? {
+        return try {
+
+            val response =
+                RetrofitClient.authApi.login(
+                    LoginRequest(
+                        email,
+                        password
+                    )
+                )
+
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                null
+            }
+
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // Check email local
     suspend fun getUserByEmail(
         email: String
     ): UserEntity? {

@@ -1,0 +1,46 @@
+package com.example.taskflow.data.local.dao
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import com.example.taskflow.data.local.entity.UserEntity
+
+@Dao
+interface UserDao {
+
+    // Đăng ký account
+    @Insert
+    suspend fun insertUser(user: UserEntity): Long
+
+    // Login bằng email + password
+    @Query("""
+        SELECT * FROM users
+        WHERE email = :email
+        AND password = :password
+        LIMIT 1
+    """)
+    suspend fun login(
+        email: String,
+        password: String
+    ): UserEntity?
+
+    // Lấy user theo id (session)
+    @Query("""
+        SELECT * FROM users
+        WHERE id = :userId
+        LIMIT 1
+    """)
+    suspend fun getUserById(
+        userId: Int
+    ): UserEntity?
+
+    // Check email đã tồn tại chưa
+    @Query("""
+        SELECT * FROM users
+        WHERE email = :email
+        LIMIT 1
+    """)
+    suspend fun getUserByEmail(
+        email: String
+    ): UserEntity?
+}

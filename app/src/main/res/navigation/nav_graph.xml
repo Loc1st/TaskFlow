@@ -46,5 +46,30 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.taskflow.ui.home.HomeFragment"
-        android:label="Home"/>
+        android:label="Home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_addTaskFragment"
+            app:destination="@id/addTaskFragment"/>
+
+        <action
+            android:id="@+id/action_homeFragment_to_taskDetailFragment"
+            app:destination="@id/taskDetailFragment"/>
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/addTaskFragment"
+        android:name="com.example.taskflow.ui.task.AddTaskFragment"
+        android:label="Add Task"/>
+
+    <fragment
+        android:id="@+id/taskDetailFragment"
+        android:name="com.example.taskflow.ui.task.TaskDetailFragment"
+        android:label="Task Detail"/>
+
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.example.taskflow.ui.calendar.CalendarFragment"
+        android:label="Calendar"/>
 </navigation>

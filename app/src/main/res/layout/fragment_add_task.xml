@@ -13,60 +13,108 @@
             android:id="@+id/etTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Task Title"/>
+            android:hint="Task Title" />
 
         <EditText
             android:id="@+id/etDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description"/>
+            android:hint="Description" />
 
+        <!-- START DATE -->
         <EditText
             android:id="@+id/etStartDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Start Date (yyyy-MM-dd)"/>
+            android:hint="Start Date"
+            android:focusable="false"
+            android:clickable="true"
+            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+            android:paddingEnd="12dp" />
 
+        <!-- START TIME -->
         <EditText
             android:id="@+id/etStartTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Start Time (HH:mm)"/>
+            android:hint="Start Time"
+            android:focusable="false"
+            android:clickable="true"
+            android:drawableEnd="@android:drawable/ic_lock_idle_alarm"
+            android:paddingEnd="12dp" />
 
+        <!-- END DATE -->
         <EditText
             android:id="@+id/etEndDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="End Date (yyyy-MM-dd)"/>
+            android:hint="End Date"
+            android:focusable="false"
+            android:clickable="true"
+            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+            android:paddingEnd="12dp" />
 
+        <!-- END TIME -->
         <EditText
             android:id="@+id/etEndTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="End Time (HH:mm)"/>
+            android:hint="End Time"
+            android:focusable="false"
+            android:clickable="true"
+            android:drawableEnd="@android:drawable/ic_lock_idle_alarm"
+            android:paddingEnd="12dp" />
 
-        <EditText
-            android:id="@+id/etPriority"
+        <!-- PRIORITY -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Priority"
+            android:textStyle="bold"
+            android:paddingTop="12dp" />
+
+        <RadioGroup
+            android:id="@+id/rgPriority"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Priority (Low / Medium / High)"/>
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbLow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Low" />
+
+            <RadioButton
+                android:id="@+id/rbMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medium" />
+
+            <RadioButton
+                android:id="@+id/rbHigh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="High" />
+        </RadioGroup>
 
         <EditText
             android:id="@+id/etCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Category"/>
+            android:hint="Category" />
 
         <CheckBox
             android:id="@+id/cbReminder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enable Reminder"/>
+            android:text="Enable Reminder" />
 
         <Button
             android:id="@+id/btnSaveTask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save Task"/>
+            android:text="Save Task" />
+
     </LinearLayout>
 </ScrollView>

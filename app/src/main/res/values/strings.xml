@@ -1,3 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TaskFlow</string>
+
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="name_hint">Name</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="create_account">Create Account</string>
+    <string name="already_have_account">Already have an account? Login</string>
+
+    <string name="hello">Hello!</string>
+    <string name="home_greeting">Your today\'s task\nalmost done!</string>
+    <string name="view_task">View Task</string>
+    <string name="in_progress">In Progress</string>
+    <string name="task_groups">Task Groups</string>
+
+    <string name="add_project">Add Project</string>
+    <string name="project_name_hint">Project Name</string>
+    <string name="description_hint">Description</string>
+    <string name="start_date_hint">Start Date</string>
+    <string name="end_date_hint">End Date</string>
+    <string name="start_time_hint">Start Time</string>
+    <string name="end_time_hint">End Time</string>
+    <string name="priority">Priority</string>
+    <string name="enable_reminder">Enable Reminder</string>
+    <string name="save_task">Save Task</string>
+
+    <string name="today_tasks">Today’s Tasks</string>
+    <string name="month_may">May</string>
+
+    <string name="status_todo">To-do</string>
+    <string name="status_done">Done</string>
+    <string name="category_all">All</string>
+    <string name="category_completed">Completed</string>
 </resources>

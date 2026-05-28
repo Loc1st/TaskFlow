@@ -1,34 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="primary_color">#5F33E1</color>
+    <color name="primary_light">#EEE9FF</color>
 
-    <!-- Primary Colors -->
-    <color name="color_primary">#7C5CFF</color>
-    <color name="color_primary_dark">#6B4FE6</color>
-    <color name="color_primary_light">#9B8FFF</color>
+    <color name="background_main">#F8F9FA</color>
+    <color name="white">#FFFFFF</color>
 
-    <!-- Accent Colors -->
-    <color name="color_magenta">#FF006E</color>
-    <color name="color_orange">#FFA500</color>
-    <color name="color_cyan">#00D4FF</color>
+    <color name="text_primary">#24252C</color>
+    <color name="text_secondary">#6E6A7C</color>
 
-    <!-- Background -->
-    <color name="color_background">#F3F0FF</color>
-    <color name="color_background_light">#FAFAF8</color>
+    <color name="status_todo_text">#0087FF</color>
+    <color name="status_todo_bg">#E7F4FF</color>
 
-    <!-- Text Colors -->
-    <color name="color_text_dark">#1A1A1A</color>
-    <color name="color_text_light">#666666</color>
-    <color name="color_text_hint">#999999</color>
+    <color name="status_in_progress_text">#FF7D53</color>
+    <color name="status_in_progress_bg">#FFE9E1</color>
 
-    <!-- Other -->
-    <color name="color_white">#FFFFFF</color>
-    <color name="color_gray">#F0F0F0</color>
-    <color name="color_border">#E0E0E0</color>
+    <color name="status_done_text">#5F33E1</color>
+    <color name="status_done_bg">#EDE8FF</color>
+
+    <color name="group_pink">#F478B8</color>
+    <color name="group_pink_light">#FFE4F2</color>
+    <color name="group_purple">#9260F4</color>
+    <color name="group_purple_light">#EDE4FF</color>
+    <color name="group_orange">#FF9142</color>
+    <color name="group_orange_light">#FFE6D4</color>
+    <color name="group_yellow">#FFD12E</color>
+    <color name="group_yellow_light">#FFF6D4</color>
 </resources>

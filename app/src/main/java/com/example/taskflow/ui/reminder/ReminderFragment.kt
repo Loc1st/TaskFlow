@@ -1,26 +1,25 @@
-package com.example.taskflow.ui.home
+package com.example.taskflow.ui.reminder
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflow.R
 import com.example.taskflow.data.local.db.DatabaseProvider
 import com.example.taskflow.data.repository.TaskRepository
-import com.example.taskflow.databinding.FragmentHomeBinding
+import com.example.taskflow.databinding.FragmentReminderBinding
 import com.example.taskflow.session.SessionManager
+import com.example.taskflow.ui.home.TaskAdapter
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
-import androidx.navigation.fragment.findNavController
 
-class HomeFragment : Fragment(
-    R.layout.fragment_home
+class ReminderFragment : Fragment(
+    R.layout.fragment_reminder
 ) {
 
     private var _binding:
-            FragmentHomeBinding? = null
+            FragmentReminderBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var adapter:
@@ -49,35 +48,23 @@ class HomeFragment : Fragment(
         )
 
         _binding =
-            FragmentHomeBinding.bind(
+            FragmentReminderBinding.bind(
                 view
             )
 
         adapter =
             TaskAdapter(
                 emptyList()
-            ) { task ->
+            ) { }
 
-                val bundle = Bundle().apply {
-                    putInt(
-                        "taskId",
-                        task.id
-                    )
-                }
-
-                findNavController().navigate(
-                    R.id.action_homeFragment_to_taskDetailFragment,
-                    bundle
-                )
-            }
-
-        binding.rvTasks.layoutManager =
+        binding.rvReminderTasks
+            .layoutManager =
             LinearLayoutManager(
                 requireContext()
             )
 
-        binding.rvTasks.adapter =
-            adapter
+        binding.rvReminderTasks
+            .adapter = adapter
 
         val userId =
             SessionManager(
@@ -85,18 +72,17 @@ class HomeFragment : Fragment(
             ).getCurrentUserId()
 
         viewModel
-            .getTasksByUser(userId)
+            .getPendingTasks(userId)
             .observe(viewLifecycleOwner) {
                     tasks ->
-                adapter.updateTasks(
-                    tasks
-                )
-            }
 
-        binding.btnAddTask
-            .setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_homeFragment_to_addTaskFragment
+                val reminderTasks =
+                    tasks.filter {
+                        it.reminderEnabled
+                    }
+
+                adapter.updateTasks(
+                    reminderTasks
                 )
             }
     }

@@ -45,12 +45,29 @@ class SplashFragment : Fragment() {
             Looper.getMainLooper()
         ).postDelayed({
 
+            if (!isAdded) return@postDelayed
+
+            val navController =
+                findNavController()
+
+            val currentDestination =
+                navController.currentDestination?.id
+
+            if (currentDestination !=
+                R.id.splashFragment
+            ) {
+                return@postDelayed
+            }
+
             if (sessionManager.isLoggedIn()) {
-                findNavController().navigate(
+
+                navController.navigate(
                     R.id.action_splashFragment_to_homeFragment
                 )
+
             } else {
-                findNavController().navigate(
+
+                navController.navigate(
                     R.id.action_splashFragment_to_loginFragment
                 )
             }

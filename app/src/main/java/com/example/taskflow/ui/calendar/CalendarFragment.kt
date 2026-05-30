@@ -10,10 +10,11 @@ import com.example.taskflow.data.local.db.DatabaseProvider
 import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentCalendarBinding
 import com.example.taskflow.session.SessionManager
-import com.example.taskflow.ui.home.TaskAdapter
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
 
@@ -26,7 +27,10 @@ class CalendarFragment : Fragment(
     private val binding get() = _binding!!
 
     private lateinit var adapter:
-            TaskAdapter
+            CalendarTaskAdapter
+
+    private lateinit var dateAdapter:
+            DateAdapter
 
     private val viewModel:
             TaskViewModel by viewModels {
@@ -54,9 +58,9 @@ class CalendarFragment : Fragment(
             FragmentCalendarBinding.bind(view)
 
         adapter =
-            TaskAdapter(
+            CalendarTaskAdapter(
                 emptyList()
-            ) { }
+            )
 
         binding.rvCalendarTasks
             .layoutManager =
@@ -72,31 +76,75 @@ class CalendarFragment : Fragment(
                 requireContext()
             ).getCurrentUserId()
 
-        binding.calendarView
-            .setOnDateChangeListener {
-                    _, year, month, dayOfMonth ->
+        // RecyclerView ngày ngang
+        val dateList =
+            mutableListOf<DateModel>()
 
-                val selectedDate =
-                    String.format(
-                        "%04d-%02d-%02d",
-                        year,
-                        month + 1,
-                        dayOfMonth
-                    )
+        val todayDate =
+            LocalDate.now()
+
+        for (i in -30..30) {
+
+            val date =
+                todayDate.plusDays(
+                    i.toLong()
+                )
+
+            dateList.add(
+                DateModel(
+                    date = date.toString(),
+                    dayNumber =
+                        date.dayOfMonth.toString(),
+                    dayName =
+                        date.dayOfWeek.getDisplayName(
+                            TextStyle.SHORT,
+                            Locale.getDefault()
+                        ),
+                    isSelected = (i == 0)
+                )
+            )
+        }
+
+        dateAdapter =
+            DateAdapter(
+                dateList
+            ) { selectedDate ->
 
                 viewModel
                     .getTasksByDate(
                         userId,
-                        selectedDate
+                        selectedDate.date
                     )
                     .observe(
                         viewLifecycleOwner
                     ) { tasks ->
+
                         adapter.updateTasks(
                             tasks
                         )
                     }
             }
+
+        val layoutManager =
+            LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+
+        binding.rvDates.layoutManager =
+            layoutManager
+
+        binding.rvDates.adapter =
+            dateAdapter
+
+        binding.rvDates.post {
+
+            layoutManager.scrollToPositionWithOffset(
+                30,
+                binding.rvDates.width / 2 - 36
+            )
+        }
 
         // Load hôm nay mặc định
         val today =
@@ -113,6 +161,7 @@ class CalendarFragment : Fragment(
             .observe(
                 viewLifecycleOwner
             ) { tasks ->
+
                 adapter.updateTasks(
                     tasks
                 )

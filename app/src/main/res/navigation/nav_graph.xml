@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <navigation
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
     app:startDestination="@id/splashFragment">
+
 
     <fragment
         android:id="@+id/splashFragment"
@@ -17,6 +19,7 @@
         <action
             android:id="@+id/action_splashFragment_to_homeFragment"
             app:destination="@id/homeFragment"/>
+
     </fragment>
 
     <fragment
@@ -31,6 +34,7 @@
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment"/>
+
     </fragment>
 
     <fragment
@@ -41,6 +45,7 @@
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment"/>
+
     </fragment>
 
     <fragment
@@ -55,8 +60,8 @@
         <action
             android:id="@+id/action_homeFragment_to_taskDetailFragment"
             app:destination="@id/taskDetailFragment"/>
-    </fragment>
 
+    </fragment>
 
     <fragment
         android:id="@+id/addTaskFragment"
@@ -66,12 +71,24 @@
     <fragment
         android:id="@+id/taskDetailFragment"
         android:name="com.example.taskflow.ui.task.TaskDetailFragment"
-        android:label="Task Detail"/>
+        android:label="Task Detail">
+
+        <argument
+            android:name="taskId"
+            app:argType="integer"/>
+
+    </fragment>
 
     <fragment
         android:id="@+id/calendarFragment"
         android:name="com.example.taskflow.ui.calendar.CalendarFragment"
-        android:label="Calendar"/>
+        android:label="Calendar">
+
+        <action
+            android:id="@+id/action_calendarFragment_to_taskDetailFragment"
+            app:destination="@id/taskDetailFragment"/>
+
+    </fragment>
 
     <fragment
         android:id="@+id/reminderFragment"
@@ -86,5 +103,8 @@
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment"/>
+
     </fragment>
+
+
 </navigation>

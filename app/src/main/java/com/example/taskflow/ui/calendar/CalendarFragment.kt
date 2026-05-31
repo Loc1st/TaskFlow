@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflow.R
 import com.example.taskflow.data.local.db.DatabaseProvider
@@ -24,7 +25,9 @@ class CalendarFragment : Fragment(
 
     private var _binding:
             FragmentCalendarBinding? = null
-    private val binding get() = _binding!!
+
+    private val binding
+        get() = _binding!!
 
     private lateinit var adapter:
             CalendarTaskAdapter
@@ -34,6 +37,7 @@ class CalendarFragment : Fragment(
 
     private val viewModel:
             TaskViewModel by viewModels {
+
         TaskViewModelFactory(
             TaskRepository(
                 DatabaseProvider
@@ -49,18 +53,36 @@ class CalendarFragment : Fragment(
         view: View,
         savedInstanceState: Bundle?
     ) {
+
         super.onViewCreated(
             view,
             savedInstanceState
         )
 
         _binding =
-            FragmentCalendarBinding.bind(view)
+            FragmentCalendarBinding.bind(
+                view
+            )
 
         adapter =
             CalendarTaskAdapter(
                 emptyList()
-            )
+            ) { task ->
+
+                val bundle =
+                    Bundle()
+
+                bundle.putInt(
+                    "taskId",
+                    task.id
+                )
+
+                findNavController()
+                    .navigate(
+                        R.id.action_calendarFragment_to_taskDetailFragment,
+                        bundle
+                    )
+            }
 
         binding.rvCalendarTasks
             .layoutManager =
@@ -69,14 +91,15 @@ class CalendarFragment : Fragment(
             )
 
         binding.rvCalendarTasks
-            .adapter = adapter
+            .adapter =
+            adapter
 
         val userId =
             SessionManager(
                 requireContext()
-            ).getCurrentUserId()
+            )
+                .getCurrentUserId()
 
-        // RecyclerView ngày ngang
         val dateList =
             mutableListOf<DateModel>()
 
@@ -91,16 +114,24 @@ class CalendarFragment : Fragment(
                 )
 
             dateList.add(
+
                 DateModel(
-                    date = date.toString(),
+                    date =
+                        date.toString(),
+
                     dayNumber =
-                        date.dayOfMonth.toString(),
+                        date.dayOfMonth
+                            .toString(),
+
                     dayName =
-                        date.dayOfWeek.getDisplayName(
-                            TextStyle.SHORT,
-                            Locale.getDefault()
-                        ),
-                    isSelected = (i == 0)
+                        date.dayOfWeek
+                            .getDisplayName(
+                                TextStyle.SHORT,
+                                Locale.getDefault()
+                            ),
+
+                    isSelected =
+                        i == 0
                 )
             )
         }
@@ -140,18 +171,21 @@ class CalendarFragment : Fragment(
 
         binding.rvDates.post {
 
-            layoutManager.scrollToPositionWithOffset(
-                30,
-                binding.rvDates.width / 2 - 36
-            )
+            layoutManager
+                .scrollToPositionWithOffset(
+                    30,
+                    binding.rvDates.width / 2 - 36
+                )
         }
 
-        // Load hôm nay mặc định
         val today =
             SimpleDateFormat(
                 "yyyy-MM-dd",
                 Locale.getDefault()
-            ).format(Date())
+            )
+                .format(
+                    Date()
+                )
 
         viewModel
             .getTasksByDate(
@@ -169,7 +203,10 @@ class CalendarFragment : Fragment(
     }
 
     override fun onDestroyView() {
+
         super.onDestroyView()
+
         _binding = null
     }
+
 }

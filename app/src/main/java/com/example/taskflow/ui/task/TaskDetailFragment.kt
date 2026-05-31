@@ -8,26 +8,34 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.taskflow.R
 import com.example.taskflow.data.local.db.DatabaseProvider
+import com.example.taskflow.data.local.entity.TaskEntity
 import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentTaskDetailBinding
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
 
-class TaskDetailFragment : Fragment(
-    R.layout.fragment_task_detail
-) {
+class TaskDetailFragment :
+    Fragment(
+        R.layout.fragment_task_detail
+    ) {
 
     private var _binding:
-            FragmentTaskDetailBinding? = null
-    private val binding get() = _binding!!
+            FragmentTaskDetailBinding? =
+        null
+
+    private val binding
+        get() = _binding!!
 
     private var currentTask:
-            com.example.taskflow.data.local.entity.TaskEntity? = null
+            TaskEntity? = null
 
     private val viewModel:
             TaskViewModel by viewModels {
+
         TaskViewModelFactory(
+
             TaskRepository(
+
                 DatabaseProvider
                     .getDatabase(
                         requireContext()
@@ -41,6 +49,7 @@ class TaskDetailFragment : Fragment(
         view: View,
         savedInstanceState: Bundle?
     ) {
+
         super.onViewCreated(
             view,
             savedInstanceState
@@ -55,20 +64,30 @@ class TaskDetailFragment : Fragment(
                 "taskId"
             ) ?: -1
 
+        binding.btnBack
+            .setOnClickListener {
+
+                findNavController()
+                    .navigateUp()
+            }
+
         viewModel.getTaskById(
             taskId
         ) { task ->
 
             if (task == null) {
+
                 Toast.makeText(
                     requireContext(),
                     "Task not found",
                     Toast.LENGTH_SHORT
                 ).show()
+
                 return@getTaskById
             }
 
-            currentTask = task
+            currentTask =
+                task
 
             binding.tvTitle.text =
                 task.title
@@ -77,27 +96,104 @@ class TaskDetailFragment : Fragment(
                 task.description
 
             binding.tvStart.text =
-                "Start: ${task.startDate} ${task.startTime}"
+                " Start\n${task.startDate} :  ${task.startTime}"
 
             binding.tvEnd.text =
-                "End: ${task.endDate} ${task.endTime}"
-
-            binding.tvPriority.text =
-                "Priority: ${task.priority}"
+                " End\n${task.endDate} :  ${task.endTime}"
 
             binding.tvCategory.text =
-                "Category: ${task.category}"
+                " Category\n${task.category}"
+
+            when (
+                task.priority.lowercase()
+            ) {
+
+                "low" -> {
+
+                    binding.tvPriority.text =
+                        "LOW"
+
+                    binding.tvPriority.setBackgroundResource(
+                        R.drawable.bg_priority_low
+                    )
+
+                    binding.tvPriority.setTextColor(
+                        android.graphics.Color.parseColor(
+                            "#2EB872"
+                        )
+                    )
+                }
+
+                "medium" -> {
+
+                    binding.tvPriority.text =
+                        "MEDIUM"
+
+                    binding.tvPriority.setBackgroundResource(
+                        R.drawable.bg_priority_medium
+                    )
+
+                    binding.tvPriority.setTextColor(
+                        requireContext().getColor(
+                            R.color.group_orange
+                        )
+                    )
+                }
+
+                else -> {
+
+                    binding.tvPriority.text =
+                        "HIGH"
+
+                    binding.tvPriority.setBackgroundResource(
+                        R.drawable.bg_priority_high
+                    )
+
+                    binding.tvPriority.setTextColor(
+                        android.graphics.Color.parseColor(
+                            "#FF4D4D"
+                        )
+                    )
+                }
+            }
+
+            updateButton(
+                task
+            )
         }
+
 
         binding.btnComplete
             .setOnClickListener {
 
-                currentTask?.let { task ->
-                    viewModel.markTaskCompleted(task)
+                currentTask?.let {
+
+                    val updated =
+
+                        it.copy(
+
+                            isCompleted =
+                                !it.isCompleted,
+
+                            syncPending =
+                                true
+                        )
+
+                    viewModel.updateTask(
+                        updated
+                    )
 
                     Toast.makeText(
+
                         requireContext(),
-                        "Task completed",
+
+                        if (
+                            updated.isCompleted
+                        )
+                            "Task completed"
+                        else
+                            "Task moved to To-do",
+
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -106,11 +202,15 @@ class TaskDetailFragment : Fragment(
                 }
             }
 
+
         binding.btnDelete
             .setOnClickListener {
 
-                currentTask?.let { task ->
-                    viewModel.deleteTask(task)
+                currentTask?.let {
+
+                    viewModel.deleteTask(
+                        it
+                    )
 
                     Toast.makeText(
                         requireContext(),
@@ -124,8 +224,26 @@ class TaskDetailFragment : Fragment(
             }
     }
 
+    private fun updateButton(
+        task: TaskEntity
+    ) {
+
+        binding.btnComplete.text =
+
+            if (
+                task.isCompleted
+            ) {
+                "↩ Mark as To-do"
+            } else {
+                "✓ Mark as Done"
+            }
+    }
+
     override fun onDestroyView() {
+
         super.onDestroyView()
-        _binding = null
+
+        _binding =
+            null
     }
 }

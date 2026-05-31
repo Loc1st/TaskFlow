@@ -9,7 +9,8 @@ import com.example.taskflow.R
 import com.example.taskflow.data.local.entity.TaskEntity
 
 class CalendarTaskAdapter(
-    private var taskList: List<TaskEntity>
+    private var taskList: List<TaskEntity>,
+    private val onClick: (TaskEntity) -> Unit
 ) : RecyclerView.Adapter<CalendarTaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(
@@ -120,6 +121,13 @@ class CalendarTaskAdapter(
                 R.drawable.bg_status_todo
             )
         }
+
+        // CLICK CARD
+        holder.itemView.setOnClickListener {
+
+            onClick(task)
+
+        }
     }
 
     override fun getItemCount(): Int {
@@ -132,4 +140,5 @@ class CalendarTaskAdapter(
         taskList = newTasks
         notifyDataSetChanged()
     }
+
 }

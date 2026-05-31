@@ -106,5 +106,10 @@
 
     </fragment>
 
+    <fragment
+        android:id="@+id/priorityTasksFragment"
+        android:name="com.example.taskflow.ui.priority.PriorityTasksFragment"
+        android:label="Priority Tasks"/>
+
 
 </navigation>

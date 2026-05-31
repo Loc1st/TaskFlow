@@ -12,6 +12,11 @@
         android:icon="@android:drawable/ic_menu_my_calendar"/>
 
     <item
+        android:id="@+id/addTaskFragment"
+        android:title="Add"
+        android:icon="@android:drawable/ic_input_add"/>
+
+    <item
         android:id="@+id/reminderFragment"
         android:title="Reminder"
         android:icon="@android:drawable/ic_lock_idle_alarm"/>

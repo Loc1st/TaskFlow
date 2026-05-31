@@ -72,6 +72,18 @@ class TaskViewModel(
         )
     }
 
+    fun getTasksByPriority(
+        userId: Int,
+        priority: String
+    ): LiveData<List<TaskEntity>> {
+
+        return taskRepository
+            .getTasksByPriority(
+                userId,
+                priority
+            )
+    }
+
     fun markTaskCompleted(
         task: TaskEntity
     ) {

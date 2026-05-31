@@ -78,4 +78,15 @@ interface TaskDao {
     suspend fun getTaskById(
         taskId: Int
     ): TaskEntity?
+
+    @Query("""
+    SELECT * FROM tasks
+    WHERE userId = :userId
+    AND LOWER(priority) = LOWER(:priority)
+    ORDER BY startDate, startTime
+""")
+    fun getTasksByPriority(
+        userId: Int,
+        priority: String
+    ): LiveData<List<TaskEntity>>
 }

@@ -69,6 +69,19 @@ class TaskRepository(
         )
     }
 
+    // Priority
+    fun getTasksByPriority(
+        userId: Int,
+        priority: String
+    ): LiveData<List<TaskEntity>> {
+
+        return taskDao
+            .getTasksByPriority(
+                userId,
+                priority
+            )
+    }
+
     // Detail
     suspend fun getTaskById(
         taskId: Int

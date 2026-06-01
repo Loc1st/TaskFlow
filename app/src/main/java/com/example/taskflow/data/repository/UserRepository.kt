@@ -77,4 +77,7 @@ class UserRepository(
     suspend fun updatePassword(userId: Int, newPassword: String){
         userDao.updatePassword(userId, newPassword)
     }
+    suspend fun updateProfile(userId: Int, username: String, email: String, phone: String) {
+        userDao.updateProfile(userId, username, email, phone)
+    }
 }

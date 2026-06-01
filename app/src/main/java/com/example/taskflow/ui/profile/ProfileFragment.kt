@@ -12,38 +12,31 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.taskflow.R
 import com.example.taskflow.data.local.db.DatabaseProvider
+import com.example.taskflow.data.local.entity.UserEntity
 import com.example.taskflow.data.repository.UserRepository
 import com.example.taskflow.databinding.FragmentProfileBinding
 import com.example.taskflow.session.SessionManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-import com.example.taskflow.data.local.entity.UserEntity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ProfileFragment : Fragment(
     R.layout.fragment_profile
 ) {
 
-    private var _binding:
-            FragmentProfileBinding? = null
+    private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var sessionManager:
-            SessionManager
+    private lateinit var sessionManager: SessionManager
     private var currentUser: UserEntity? = null
 
-    private val userRepository:
-            UserRepository by lazy {
+    private val userRepository: UserRepository by lazy {
         UserRepository(
-            DatabaseProvider
-                .getDatabase(
-                    requireContext()
-                )
-                .userDao()
+            DatabaseProvider.getDatabase(requireContext()).userDao()
         )
     }
 
@@ -52,12 +45,8 @@ class ProfileFragment : Fragment(
             ActivityResultContracts.PickVisualMedia()
         ) { uri ->
             if (uri != null) {
-                // Hiển thị ngay lên giao diện cho mượt
-                binding.ivAvatar.setImageURI(
-                    uri
-                )
+                binding.ivAvatar.setImageURI(uri)
 
-                // Copy ảnh và lưu vào DB ở Background Thread
                 CoroutineScope(Dispatchers.IO).launch {
                     val savedPath = saveImageToInternalStorage(uri)
 
@@ -73,20 +62,9 @@ class ProfileFragment : Fragment(
             }
         }
 
-    // --- HÀM HỖ TRỢ COPY ẢNH VÀO THƯ MỤC CỦA APP ---
-    private fun saveImageToInternalStorage(
-        uri: Uri
-    ): String {
-        val inputStream =
-            requireContext()
-                .contentResolver
-                .openInputStream(uri)
-
-        val file = File(
-            requireContext().filesDir,
-            "avatar_${sessionManager.getCurrentUserId()}.jpg"
-        )
-
+    private fun saveImageToInternalStorage(uri: Uri): String {
+        val inputStream = requireContext().contentResolver.openInputStream(uri)
+        val file = File(requireContext().filesDir, "avatar_${sessionManager.getCurrentUserId()}.jpg")
         val outputStream = FileOutputStream(file)
 
         inputStream?.copyTo(outputStream)
@@ -96,48 +74,19 @@ class ProfileFragment : Fragment(
         return file.absolutePath
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(
-            view,
-            savedInstanceState
-        )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentProfileBinding.bind(view)
+        sessionManager = SessionManager(requireContext())
+        val userId = sessionManager.getCurrentUserId()
 
-        _binding =
-            FragmentProfileBinding.bind(
-                view
-            )
-
-        sessionManager =
-            SessionManager(
-                requireContext()
-            )
-
-        val userId =
-            sessionManager
-                .getCurrentUserId()
-
-        CoroutineScope(
-            Dispatchers.Main
-        ).launch {
-
-            val user =
-                userRepository
-                    .getUserById(
-                        userId
-                    )
-
+        // 1. Lấy dữ liệu người dùng khi load trang
+        CoroutineScope(Dispatchers.Main).launch {
+            val user = userRepository.getUserById(userId)
             user?.let {
-
-                //thay doi
                 currentUser = it
-                //
-                binding.tvUsername.text =
-                    it.username
+                binding.tvUsername.text = it.username
 
-                // --- HIỂN THỊ ẢNH TỪ DATABASE KHI LOAD TRANG ---
                 it.avatarPath?.let { path ->
                     val file = File(path)
                     if (file.exists()) {
@@ -147,49 +96,42 @@ class ProfileFragment : Fragment(
             }
         }
 
-        binding.ivAvatar
-            .setOnClickListener {
-                pickMedia.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                    )
-                )
-            }
+        // 2. Các sự kiện Click trên giao diện
+        binding.ivAvatar.setOnClickListener {
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
 
-        binding.btnEditProfile
-            .setOnClickListener {
-                Toast.makeText(requireContext(), "Chỉnh sửa hồ sơ", Toast.LENGTH_SHORT).show()
-            }
+        // Nút Chỉnh sửa hồ sơ
+        binding.btnEditProfile.setOnClickListener {
+            currentUser?.let { user ->
+                showEditProfileDialog(user)
+            } ?: Toast.makeText(requireContext(), "Đang tải dữ liệu...", Toast.LENGTH_SHORT).show()
+        }
 
-        binding.menuAccount
-            .setOnClickListener {
-                Toast.makeText(requireContext(), "Thông tin tài khoản", Toast.LENGTH_SHORT).show()
-            }
+        // Nút Xem thông tin tài khoản
+        binding.menuAccount.setOnClickListener {
+            currentUser?.let { user ->
+                showAccountInfoDialog(user)
+            } ?: Toast.makeText(requireContext(), "Đang tải dữ liệu...", Toast.LENGTH_SHORT).show()
+        }
 
-        binding.menuNotification
-            .setOnClickListener {
-                Toast.makeText(requireContext(), "Cài đặt thông báo", Toast.LENGTH_SHORT).show()
-            }
+        // Nút Đổi mật khẩu
+        binding.menuPassword.setOnClickListener {
+            currentUser?.let { user ->
+                showChangePasswordDialog(user)
+            } ?: Toast.makeText(requireContext(), "Đang tải dữ liệu...", Toast.LENGTH_SHORT).show()
+        }
 
-        binding.menuPassword
-            .setOnClickListener {
-                currentUser?.let { user ->
-                    showChangePasswordDialog(user)
-                } ?: run {
-                    Toast.makeText(requireContext(), "Đang tải dữ liệu...", Toast.LENGTH_SHORT).show()
-                }
-            }
+        // Nút Cài đặt thông báo (hiện tại để Toast)
+        binding.menuNotification.setOnClickListener {
+            Toast.makeText(requireContext(), "Cài đặt thông báo", Toast.LENGTH_SHORT).show()
+        }
 
-        binding.btnLogout
-            .setOnClickListener {
-
-                sessionManager.logout()
-
-                findNavController()
-                    .navigate(
-                        R.id.action_profileFragment_to_loginFragment
-                    )
-            }
+        // Nút Đăng xuất
+        binding.btnLogout.setOnClickListener {
+            sessionManager.logout()
+            findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+        }
     }
 
     override fun onDestroyView() {
@@ -197,12 +139,72 @@ class ProfileFragment : Fragment(
         _binding = null
     }
 
-    // --- HÀM HỖ TRỢ: BẬT HỘP THOẠI ĐỔI MẬT KHẨU (ĐÃ CẬP NHẬT) ---
-    private fun showChangePasswordDialog(user: UserEntity) {
-        // Nạp giao diện dialog_change_password.xml
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_change_password, null)
 
-        // Ánh xạ thêm ô nhập Email
+
+    // 1. Hộp thoại Chỉnh sửa hồ sơ
+    private fun showEditProfileDialog(user: UserEntity) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_profile, null)
+        val edtUsername = dialogView.findViewById<EditText>(R.id.edtEditUsername)
+        val edtPhone = dialogView.findViewById<EditText>(R.id.edtEditPhone)
+        val edtEmail = dialogView.findViewById<EditText>(R.id.edtEditEmail)
+
+        edtUsername.setText(user.username)
+        edtPhone.setText(user.phone ?: "")
+        edtEmail.setText(user.email)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Chỉnh sửa hồ sơ")
+            .setView(dialogView)
+            .setPositiveButton("Lưu") { dialog, _ ->
+                val newUsername = edtUsername.text.toString().trim()
+                val newPhone = edtPhone.text.toString().trim()
+                val newEmail = edtEmail.text.toString().trim()
+
+                if (newUsername.isEmpty() || newEmail.isEmpty()) {
+                    Toast.makeText(requireContext(), "Tên và Email không được để trống!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    userRepository.updateProfile(user.id, newUsername, newEmail, newPhone)
+
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Đã cập nhật hồ sơ!", Toast.LENGTH_SHORT).show()
+                        binding.tvUsername.text = newUsername
+                        currentUser = currentUser?.copy(username = newUsername, email = newEmail, phone = newPhone)
+                        dialog.dismiss()
+                    }
+                }
+            }
+            .setNegativeButton("Hủy") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    // 2. Hộp thoại Xem thông tin tài khoản
+    private fun showAccountInfoDialog(user: UserEntity) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_account_info, null)
+        val edtUsername = dialogView.findViewById<EditText>(R.id.edtInfoUsername)
+        val edtPhone = dialogView.findViewById<EditText>(R.id.edtInfoPhone)
+        val edtEmail = dialogView.findViewById<EditText>(R.id.edtInfoEmail)
+
+        edtUsername.setText(user.username)
+        edtPhone.setText(user.phone ?: "Chưa cập nhật")
+        edtEmail.setText(user.email)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Thông tin tài khoản")
+            .setView(dialogView)
+            .setPositiveButton("Đóng") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    // 3. Hộp thoại Đổi mật khẩu
+    private fun showChangePasswordDialog(user: UserEntity) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_change_password, null)
         val edtEmail = dialogView.findViewById<EditText>(R.id.edtEmail)
         val edtOldPassword = dialogView.findViewById<EditText>(R.id.edtOldPassword)
         val edtNewPassword = dialogView.findViewById<EditText>(R.id.edtNewPassword)
@@ -211,36 +213,30 @@ class ProfileFragment : Fragment(
             .setTitle("Đổi mật khẩu")
             .setView(dialogView)
             .setPositiveButton("Lưu thay đổi") { dialog, _ ->
-                // Lấy dữ liệu người dùng nhập vào
                 val inputEmail = edtEmail.text.toString().trim()
                 val oldPass = edtOldPassword.text.toString()
                 val newPass = edtNewPassword.text.toString()
 
-                // 1. Kiểm tra Email nhập vào có khớp với Email của tài khoản không
                 if (inputEmail != user.email) {
                     Toast.makeText(requireContext(), "Email xác nhận không chính xác!", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
-                // 2. Kiểm tra mật khẩu cũ có khớp với Database không
                 if (oldPass != user.password) {
                     Toast.makeText(requireContext(), "Mật khẩu hiện tại không đúng!", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
-                // 3. Kiểm tra điều kiện mật khẩu mới
                 if (newPass.isEmpty() || newPass.length < 6) {
                     Toast.makeText(requireContext(), "Mật khẩu mới phải có ít nhất 6 ký tự!", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
-                // 4. Thực hiện lưu vào Database
                 CoroutineScope(Dispatchers.IO).launch {
                     userRepository.updatePassword(user.id, newPass)
 
                     withContext(Dispatchers.Main) {
                         Toast.makeText(requireContext(), "Đã đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show()
-                        // Cập nhật lại biến currentUser để lần sau đổi tiếp không bị lỗi
                         currentUser = currentUser?.copy(password = newPass)
                         dialog.dismiss()
                     }

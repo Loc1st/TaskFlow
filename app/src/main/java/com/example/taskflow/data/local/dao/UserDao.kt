@@ -64,4 +64,16 @@ interface UserDao {
         userId: Int,
         newPassword: String,
     )
+
+    @Query("""
+        UPDATE users 
+        SET username = :username, email = :email, phone = :phone 
+        WHERE id = :userId
+    """)
+    suspend fun updateProfile(
+        userId: Int,
+        username: String,
+        email: String,
+        phone: String
+    )
 }

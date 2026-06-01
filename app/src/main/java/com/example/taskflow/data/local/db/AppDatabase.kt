@@ -12,7 +12,7 @@ import com.example.taskflow.data.local.entity.UserEntity
         UserEntity::class,
         TaskEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

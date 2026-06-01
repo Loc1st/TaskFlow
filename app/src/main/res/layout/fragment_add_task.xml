@@ -13,7 +13,7 @@
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Task Title"
+        android:hint="Tên công việc"
         android:background="@drawable/bg_edittext"
         android:padding="16dp"
         android:textColor="@color/text_primary"
@@ -24,7 +24,7 @@
         android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Description"
+        android:hint="Mô tả"
         android:background="@drawable/bg_edittext"
         android:padding="16dp"
         android:textColor="@color/text_primary"
@@ -35,7 +35,7 @@
         android:id="@+id/etStartDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Start Date"
+        android:hint="Ngày bắt đầu"
         android:focusable="false"
         android:clickable="true"
         android:background="@drawable/bg_edittext"
@@ -49,7 +49,7 @@
         android:id="@+id/etStartTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Start Time"
+        android:hint="Giờ bắt đầu"
         android:focusable="false"
         android:clickable="true"
         android:background="@drawable/bg_edittext"
@@ -63,7 +63,7 @@
         android:id="@+id/etEndDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="End Date"
+        android:hint="Ngày kết thúc"
         android:focusable="false"
         android:clickable="true"
         android:background="@drawable/bg_edittext"
@@ -77,7 +77,7 @@
         android:id="@+id/etEndTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="End Time"
+        android:hint="Giờ kết thúc"
         android:focusable="false"
         android:clickable="true"
         android:background="@drawable/bg_edittext"
@@ -90,7 +90,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Priority"
+        android:text="Mức ưu tiên"
         android:textColor="@color/text_primary"
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
@@ -107,28 +107,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:text="Low" />
+            android:text="Thấp" />
 
         <RadioButton
             android:id="@+id/rbMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:text="Medium" />
+            android:text="Trung bình" />
 
         <RadioButton
             android:id="@+id/rbHigh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:text="High" />
+            android:text="Cao" />
     </RadioGroup>
 
     <EditText
         android:id="@+id/etCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category"
+        android:hint="Danh mục"
         android:background="@drawable/bg_edittext"
         android:padding="16dp"
         android:textColor="@color/text_primary"
@@ -140,14 +140,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/text_primary"
-        android:text="Enable Reminder"
+        android:text="Bật nhắc nhở"
         android:layout_marginBottom="24dp" />
 
     <Button
         android:id="@+id/btnSaveTask"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="Save Task"
+        android:text="Lưu công việc"
         android:textColor="@color/white"
         android:textSize="18sp"
         app:backgroundTint="@color/primary_color"

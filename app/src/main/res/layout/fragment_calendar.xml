@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="Today's Tasks"
+        android:text="Công việc hôm nay"
         android:textColor="@color/text_primary"
         android:textSize="26sp"
         android:textStyle="bold" />
@@ -37,7 +37,7 @@
             android:layout_weight="1"
             android:background="@drawable/bg_filter_selected"
             android:gravity="center"
-            android:text="All"
+            android:text="Tất cả"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -50,7 +50,7 @@
             android:layout_weight="1"
             android:background="@drawable/bg_filter_normal"
             android:gravity="center"
-            android:text="To-do"
+            android:text="Chưa hoàn thành"
             android:textColor="@color/primary_color"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -63,7 +63,7 @@
             android:layout_weight="1"
             android:background="@drawable/bg_filter_normal"
             android:gravity="center"
-            android:text="Done"
+            android:text="Hoàn thành"
             android:textColor="@color/primary_color"
             android:textSize="14sp"
             android:textStyle="bold" />

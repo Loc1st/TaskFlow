@@ -75,8 +75,20 @@ class PriorityTasksFragment : Fragment(
 
         binding.tvPriorityTitle.text =
 
-            priority.uppercase() +
-                    " PRIORITY"
+            when (priority.lowercase()) {
+
+                "high" ->
+                    "ƯU TIÊN CAO"
+
+                "medium" ->
+                    "ƯU TIÊN TRUNG BÌNH"
+
+                "low" ->
+                    "ƯU TIÊN THẤP"
+
+                else ->
+                    "DANH SÁCH CÔNG VIỆC"
+            }
 
 
 
@@ -130,10 +142,13 @@ class PriorityTasksFragment : Fragment(
             )
             .observe(
                 viewLifecycleOwner
-            ) {
+            ) { tasks ->
+
+                binding.tvTaskCount.text =
+                    "${tasks.size} công việc"
 
                 adapter.update(
-                    it
+                    tasks
                 )
             }
 

@@ -55,7 +55,17 @@ class CalendarTaskAdapter(
 
         // PRIORITY
         holder.tvCategory.text =
-            task.priority.uppercase()
+
+            when(task.priority.lowercase()) {
+
+                "high" -> "CAO"
+
+                "medium" -> "TRUNG BÌNH"
+
+                "low" -> "THẤP"
+
+                else -> task.priority
+            }
 
         when (task.priority.lowercase()) {
 
@@ -88,13 +98,13 @@ class CalendarTaskAdapter(
             task.title
 
         holder.tvTime.text =
-            task.startTime
+            "Kết thúc:  ${task.endDate} • ${task.endTime}"
 
         // STATUS
         if (task.isCompleted) {
 
             holder.tvStatus.text =
-                "Done"
+                "Hoàn thành"
 
             holder.tvStatus.setTextColor(
                 holder.itemView.context.getColor(
@@ -109,7 +119,7 @@ class CalendarTaskAdapter(
         } else {
 
             holder.tvStatus.text =
-                "To-do"
+                "Chưa hoàn thành"
 
             holder.tvStatus.setTextColor(
                 holder.itemView.context.getColor(

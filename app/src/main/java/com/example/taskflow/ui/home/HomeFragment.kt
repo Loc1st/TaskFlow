@@ -161,7 +161,7 @@ class HomeFragment : Fragment(
 
                 bindPriorityCard(
                     binding.cardHigh.root,
-                    "HIGH",
+                    "CAO",
                     highTasks.size,
 
                     if (highTasks.isEmpty())
@@ -189,7 +189,7 @@ class HomeFragment : Fragment(
 
                 bindPriorityCard(
                     binding.cardMedium.root,
-                    "MEDIUM",
+                    "TRUNG BÌNH",
                     mediumTasks.size,
 
                     if (mediumTasks.isEmpty())
@@ -217,7 +217,7 @@ class HomeFragment : Fragment(
 
                 bindPriorityCard(
                     binding.cardLow.root,
-                    "LOW",
+                    "THẤP",
                     lowTasks.size,
 
                     if (lowTasks.isEmpty())
@@ -395,24 +395,24 @@ class HomeFragment : Fragment(
             title
         ) {
 
-            "LOW" -> {
+            "THẤP" -> {
 
                 tvPriority.setTextColor(
                     requireContext().getColor(
-                        android.R.color.holo_green_dark
+                        android.R.color.holo_green_light
                     )
                 )
 
                 circle.setIndicatorColor(
                     requireContext().getColor(
-                        android.R.color.holo_green_dark
+                        android.R.color.holo_green_light
                     )
                 )
             }
 
 
 
-            "MEDIUM" -> {
+            "TRUNG BÌNH" -> {
 
                 tvPriority.setTextColor(
                     requireContext().getColor(
@@ -429,7 +429,7 @@ class HomeFragment : Fragment(
 
 
 
-            "HIGH" -> {
+            "CAO" -> {
 
                 tvPriority.setTextColor(
                     requireContext().getColor(

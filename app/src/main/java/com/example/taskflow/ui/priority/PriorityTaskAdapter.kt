@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.taskflow.data.local.entity.TaskEntity
-import com.example.taskflow.databinding.ItemUpcomingTaskBinding
-
+import com.example.taskflow.databinding.ItemPriorityTaskBinding
+import com.example.taskflow.R
 class PriorityTaskAdapter(
 
     private var tasks: List<TaskEntity> =
@@ -19,7 +19,7 @@ class PriorityTaskAdapter(
 
     class ViewHolder(
         val binding:
-        ItemUpcomingTaskBinding
+        ItemPriorityTaskBinding
     ) :
         RecyclerView.ViewHolder(
             binding.root
@@ -32,7 +32,7 @@ class PriorityTaskAdapter(
 
         return ViewHolder(
 
-            ItemUpcomingTaskBinding.inflate(
+            ItemPriorityTaskBinding.inflate(
 
                 LayoutInflater.from(
                     parent.context
@@ -62,14 +62,57 @@ class PriorityTaskAdapter(
         holder.binding.tvPriority.text =
             task.priority
 
-        holder.binding.tvDeadline.text =
+        holder.binding.tvDate.text =
             task.endDate
+
+        holder.binding.tvDescription.text =
+            task.description
 
         holder.itemView
             .setOnClickListener {
 
                 onClick(task)
             }
+
+        holder.binding.tvTitle.text =
+            task.title
+
+        holder.binding.tvDescription.text =
+            task.description
+
+        holder.binding.tvDate.text =
+            task.endDate
+
+        if (task.isCompleted) {
+
+            holder.binding.tvStatus.text =
+                "ĐÃ HOÀN THÀNH"
+
+            holder.binding.tvStatus.setTextColor(
+                holder.itemView.context.getColor(
+                    R.color.status_done_text
+                )
+            )
+
+            holder.binding.tvStatus.setBackgroundResource(
+                R.drawable.bg_status_done
+            )
+
+        } else {
+
+            holder.binding.tvStatus.text =
+                "CHƯA HOÀN THÀNH"
+
+            holder.binding.tvStatus.setTextColor(
+                holder.itemView.context.getColor(
+                    R.color.status_todo_text
+                )
+            )
+
+            holder.binding.tvStatus.setBackgroundResource(
+                R.drawable.bg_status_todo
+            )
+        }
     }
 
     fun update(

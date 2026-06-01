@@ -71,95 +71,59 @@ class UpcomingAdapter(
         holder.binding.tvTitle.text =
             task.title
 
-        holder.binding.tvPriority.text =
-            task.priority.uppercase()
+        when (task.priority.lowercase()) {
 
-        holder.binding.tvDeadline.text =
-            task.endTime
-
-
-
-        when (
-            task.priority.lowercase()
-        ) {
-
-            "low" -> {
-
-                holder.binding.root
-                    .setBackgroundColor(
-
-                        ContextCompat.getColor(
-
-                            holder.itemView.context,
-
-                            R.color.status_todo_bg
-                        )
+            "high" -> {
+                holder.binding.tvPriority.text = "CAO"
+                holder.binding.tvPriority.setTextColor(
+                    holder.itemView.context.getColor(
+                        android.R.color.holo_red_dark
                     )
-
-                holder.binding.tvPriority
-                    .setTextColor(
-
-                        ContextCompat.getColor(
-
-                            holder.itemView.context,
-
-                            R.color.status_todo_text
-                        )
-                    )
+                )
             }
-
-
 
             "medium" -> {
-
-                holder.binding.root
-                    .setBackgroundColor(
-
-                        ContextCompat.getColor(
-
-                            holder.itemView.context,
-
-                            R.color.status_in_progress_bg
-                        )
+                holder.binding.tvPriority.text = "TRUNG BÌNH"
+                holder.binding.tvPriority.setTextColor(
+                    holder.itemView.context.getColor(
+                        R.color.status_in_progress_text
                     )
-
-                holder.binding.tvPriority
-                    .setTextColor(
-
-                        ContextCompat.getColor(
-
-                            holder.itemView.context,
-
-                            R.color.status_in_progress_text
-                        )
-                    )
+                )
             }
 
-
-
-            else -> {
-
-                holder.binding.root
-                    .setBackgroundColor(
-
-                        ContextCompat.getColor(
-
-                            holder.itemView.context,
-
-                            R.color.group_pink_light
-                        )
+            "low" -> {
+                holder.binding.tvPriority.text = "THẤP"
+                holder.binding.tvPriority.setTextColor(
+                    holder.itemView.context.getColor(
+                        R.color.status_todo_text
                     )
+                )
+            }
+        }
 
-                holder.binding.tvPriority
-                    .setTextColor(
+        holder.binding.tvDeadline.text =
+            "⏰ Kết thúc: ${task.endTime}"
 
-                        ContextCompat.getColor(
 
-                            holder.itemView.context,
 
-                            android.R.color.holo_red_dark
-                        )
-                    )
+        when(task.priority.lowercase()) {
+
+            "high" -> {
+                holder.binding.root.setBackgroundResource(
+                    R.drawable.bg_task_high
+                )
+            }
+
+            "medium" -> {
+                holder.binding.root.setBackgroundResource(
+                    R.drawable.bg_task_medium
+                )
+            }
+
+            "low" -> {
+                holder.binding.root.setBackgroundResource(
+                    R.drawable.bg_task_low
+                )
             }
         }
 

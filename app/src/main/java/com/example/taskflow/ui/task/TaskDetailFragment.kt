@@ -79,7 +79,7 @@ class TaskDetailFragment :
 
                 Toast.makeText(
                     requireContext(),
-                    "Task not found",
+                    "Không tìm thấy công việc",
                     Toast.LENGTH_SHORT
                 ).show()
 
@@ -96,13 +96,24 @@ class TaskDetailFragment :
                 task.description
 
             binding.tvStart.text =
-                " Start\n${task.startDate} :  ${task.startTime}"
+                "📅 Bắt đầu\n${task.startDate} • ${task.startTime}"
 
             binding.tvEnd.text =
-                " End\n${task.endDate} :  ${task.endTime}"
+                "⏰ Kết thúc\n${task.endDate} • ${task.endTime}"
 
             binding.tvCategory.text =
-                " Category\n${task.category}"
+                "📂 Danh mục\n${
+                    when(task.category.lowercase()) {
+
+                        "study" -> "Học tập"
+
+                        "work" -> "Công việc"
+
+                        "personal" -> "Cá nhân"
+
+                        else -> task.category
+                    }
+                }"
 
             when (
                 task.priority.lowercase()
@@ -111,7 +122,7 @@ class TaskDetailFragment :
                 "low" -> {
 
                     binding.tvPriority.text =
-                        "LOW"
+                        "THẤP"
 
                     binding.tvPriority.setBackgroundResource(
                         R.drawable.bg_priority_low
@@ -127,7 +138,7 @@ class TaskDetailFragment :
                 "medium" -> {
 
                     binding.tvPriority.text =
-                        "MEDIUM"
+                        "TRUNG BÌNH"
 
                     binding.tvPriority.setBackgroundResource(
                         R.drawable.bg_priority_medium
@@ -143,7 +154,7 @@ class TaskDetailFragment :
                 else -> {
 
                     binding.tvPriority.text =
-                        "HIGH"
+                        "CAO"
 
                     binding.tvPriority.setBackgroundResource(
                         R.drawable.bg_priority_high
@@ -190,9 +201,9 @@ class TaskDetailFragment :
                         if (
                             updated.isCompleted
                         )
-                            "Task completed"
+                            "Đã hoàn thành công việc"
                         else
-                            "Task moved to To-do",
+                            "Đã chuyển sang chưa hoàn thành",
 
                         Toast.LENGTH_SHORT
                     ).show()
@@ -214,7 +225,7 @@ class TaskDetailFragment :
 
                     Toast.makeText(
                         requireContext(),
-                        "Task deleted",
+                        "Đã xóa công việc",
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -233,9 +244,9 @@ class TaskDetailFragment :
             if (
                 task.isCompleted
             ) {
-                "↩ Mark as To-do"
+                "Chưa hoàn thành"
             } else {
-                "✓ Mark as Done"
+                "Hoàn thành"
             }
     }
 

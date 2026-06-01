@@ -18,6 +18,7 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
+import com.example.taskflow.data.local.entity.TaskEntity
 
 class CalendarFragment : Fragment(
     R.layout.fragment_calendar
@@ -48,6 +49,8 @@ class CalendarFragment : Fragment(
             )
         )
     }
+
+    private var allTasks = emptyList<TaskEntity>()
 
     override fun onViewCreated(
         view: View,
@@ -124,11 +127,18 @@ class CalendarFragment : Fragment(
                             .toString(),
 
                     dayName =
-                        date.dayOfWeek
-                            .getDisplayName(
-                                TextStyle.SHORT,
-                                Locale.getDefault()
-                            ),
+                        when (date.dayOfWeek.value) {
+
+                            1 -> "T2"
+                            2 -> "T3"
+                            3 -> "T4"
+                            4 -> "T5"
+                            5 -> "T6"
+                            6 -> "T7"
+                            7 -> "CN"
+
+                            else -> ""
+                        },
 
                     isSelected =
                         i == 0
@@ -149,6 +159,8 @@ class CalendarFragment : Fragment(
                     .observe(
                         viewLifecycleOwner
                     ) { tasks ->
+
+                        allTasks = tasks
 
                         adapter.updateTasks(
                             tasks
@@ -196,17 +208,112 @@ class CalendarFragment : Fragment(
                 viewLifecycleOwner
             ) { tasks ->
 
+                allTasks = tasks
+
                 adapter.updateTasks(
                     tasks
                 )
             }
+
+
+
+        binding.btnAll.setOnClickListener {
+
+            selectFilter(
+                binding.btnAll
+            )
+
+            adapter.updateTasks(
+                allTasks
+            )
+        }
+
+
+
+        binding.btnTodo.setOnClickListener {
+
+            selectFilter(
+                binding.btnTodo
+            )
+
+            adapter.updateTasks(
+
+                allTasks.filter {
+
+                    !it.isCompleted
+                }
+            )
+        }
+
+
+
+        binding.btnDone.setOnClickListener {
+
+            selectFilter(
+                binding.btnDone
+            )
+
+            adapter.updateTasks(
+
+                allTasks.filter {
+
+                    it.isCompleted
+                }
+            )
+        }
+
     }
 
-    override fun onDestroyView() {
+    private fun selectFilter(
+        selected: View
+    ) {
 
-        super.onDestroyView()
+        val buttons = listOf(
+            binding.btnAll,
+            binding.btnTodo,
+            binding.btnDone
+        )
 
-        _binding = null
+        buttons.forEach {
+
+            it.setBackgroundResource(
+                R.drawable.bg_filter_normal
+            )
+
+            it.setTextColor(
+                requireContext().getColor(
+                    R.color.primary_color
+                )
+            )
+        }
+
+        selected.setBackgroundResource(
+            R.drawable.bg_filter_selected
+        )
+
+        when(selected) {
+
+            binding.btnAll ->
+                binding.btnAll.setTextColor(
+                    requireContext().getColor(
+                        R.color.white
+                    )
+                )
+
+            binding.btnTodo ->
+                binding.btnTodo.setTextColor(
+                    requireContext().getColor(
+                        R.color.white
+                    )
+                )
+
+            binding.btnDone ->
+                binding.btnDone.setTextColor(
+                    requireContext().getColor(
+                        R.color.white
+                    )
+                )
+        }
     }
 
 }

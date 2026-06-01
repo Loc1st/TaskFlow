@@ -2,6 +2,7 @@ package com.example.taskflow.ui.profile
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -75,10 +76,29 @@ class ProfileFragment : Fragment(
                 binding.tvUsername.text =
                     it.username
 
-                binding.tvEmail.text =
-                    it.email
+//                binding.tvEmail.text =
+//                    it.email
             }
         }
+        binding.btnEditProfile
+            .setOnClickListener {
+                Toast.makeText(requireContext(), "Chỉnh sửa hồ sơ", Toast.LENGTH_SHORT).show()
+            }
+
+        binding.menuAccount
+            .setOnClickListener {
+                Toast.makeText(requireContext(), "Thông tin tài khoản", Toast.LENGTH_SHORT).show()
+            }
+
+        binding.menuNotification
+            .setOnClickListener {
+                Toast.makeText(requireContext(), "Cài đặt thông báo", Toast.LENGTH_SHORT).show()
+            }
+
+        binding.menuPassword
+            .setOnClickListener {
+                Toast.makeText(requireContext(), "Đổi mật khẩu", Toast.LENGTH_SHORT).show()
+            }
 
         binding.btnLogout
             .setOnClickListener {

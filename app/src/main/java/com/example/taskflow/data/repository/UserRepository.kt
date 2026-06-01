@@ -70,4 +70,7 @@ class UserRepository(
             userId
         )
     }
+    suspend fun updateAvatar(userId: Int, path: String) {
+        userDao.updateAvatar(userId, path)
+    }
 }

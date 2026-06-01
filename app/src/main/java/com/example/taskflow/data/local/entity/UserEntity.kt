@@ -15,5 +15,8 @@ data class UserEntity(
 
     val password: String,
 
-    val avatarUrl: String? = null
+    val avatarPath: String? = null
+    //val avatarUrl: String? = null
+
+
 )

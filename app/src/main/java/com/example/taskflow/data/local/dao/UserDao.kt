@@ -43,4 +43,14 @@ interface UserDao {
     suspend fun getUserByEmail(
         email: String
     ): UserEntity?
+
+    @Query("""
+        UPDATE users 
+        SET avatarPath = :path 
+        WHERE id = :userId
+    """)
+    suspend fun updateAvatar(
+        userId: Int,
+        path: String
+    )
 }

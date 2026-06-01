@@ -2,7 +2,9 @@ package com.example.taskflow.ui.profile
 
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import com.example.taskflow.data.local.entity.UserEntity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ProfileFragment : Fragment(
     R.layout.fragment_profile
@@ -30,6 +34,7 @@ class ProfileFragment : Fragment(
 
     private lateinit var sessionManager:
             SessionManager
+    private var currentUser: UserEntity? = null
 
     private val userRepository:
             UserRepository by lazy {
@@ -125,6 +130,10 @@ class ProfileFragment : Fragment(
                     )
 
             user?.let {
+
+                //thay doi
+                currentUser = it
+                //
                 binding.tvUsername.text =
                     it.username
 
@@ -164,7 +173,11 @@ class ProfileFragment : Fragment(
 
         binding.menuPassword
             .setOnClickListener {
-                Toast.makeText(requireContext(), "Đổi mật khẩu", Toast.LENGTH_SHORT).show()
+                currentUser?.let { user ->
+                    showChangePasswordDialog(user)
+                } ?: run {
+                    Toast.makeText(requireContext(), "Đang tải dữ liệu...", Toast.LENGTH_SHORT).show()
+                }
             }
 
         binding.btnLogout
@@ -182,5 +195,60 @@ class ProfileFragment : Fragment(
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    // --- HÀM HỖ TRỢ: BẬT HỘP THOẠI ĐỔI MẬT KHẨU (ĐÃ CẬP NHẬT) ---
+    private fun showChangePasswordDialog(user: UserEntity) {
+        // Nạp giao diện dialog_change_password.xml
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_change_password, null)
+
+        // Ánh xạ thêm ô nhập Email
+        val edtEmail = dialogView.findViewById<EditText>(R.id.edtEmail)
+        val edtOldPassword = dialogView.findViewById<EditText>(R.id.edtOldPassword)
+        val edtNewPassword = dialogView.findViewById<EditText>(R.id.edtNewPassword)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Đổi mật khẩu")
+            .setView(dialogView)
+            .setPositiveButton("Lưu thay đổi") { dialog, _ ->
+                // Lấy dữ liệu người dùng nhập vào
+                val inputEmail = edtEmail.text.toString().trim()
+                val oldPass = edtOldPassword.text.toString()
+                val newPass = edtNewPassword.text.toString()
+
+                // 1. Kiểm tra Email nhập vào có khớp với Email của tài khoản không
+                if (inputEmail != user.email) {
+                    Toast.makeText(requireContext(), "Email xác nhận không chính xác!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                // 2. Kiểm tra mật khẩu cũ có khớp với Database không
+                if (oldPass != user.password) {
+                    Toast.makeText(requireContext(), "Mật khẩu hiện tại không đúng!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                // 3. Kiểm tra điều kiện mật khẩu mới
+                if (newPass.isEmpty() || newPass.length < 6) {
+                    Toast.makeText(requireContext(), "Mật khẩu mới phải có ít nhất 6 ký tự!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                // 4. Thực hiện lưu vào Database
+                CoroutineScope(Dispatchers.IO).launch {
+                    userRepository.updatePassword(user.id, newPass)
+
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Đã đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show()
+                        // Cập nhật lại biến currentUser để lần sau đổi tiếp không bị lỗi
+                        currentUser = currentUser?.copy(password = newPass)
+                        dialog.dismiss()
+                    }
+                }
+            }
+            .setNegativeButton("Hủy") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 }

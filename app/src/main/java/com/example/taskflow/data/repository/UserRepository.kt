@@ -73,4 +73,8 @@ class UserRepository(
     suspend fun updateAvatar(userId: Int, path: String) {
         userDao.updateAvatar(userId, path)
     }
+
+    suspend fun updatePassword(userId: Int, newPassword: String){
+        userDao.updatePassword(userId, newPassword)
+    }
 }

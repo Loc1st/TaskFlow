@@ -53,4 +53,15 @@ interface UserDao {
         userId: Int,
         path: String
     )
+
+    // đổi mk
+    @Query("""
+        UPDATE users
+        SET password = :newPassword
+        WHERE id = :userId
+    """)
+    suspend fun updatePassword(
+        userId: Int,
+        newPassword: String,
+    )
 }

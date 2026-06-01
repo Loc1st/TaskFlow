@@ -476,8 +476,30 @@ class HomeFragment : Fragment(
                  *     .load(it.avatarUrl)
                  *     .into(binding.imgAvatar)
                  */
+                //đã thêm phần avatar rồi
+                it.avatarPath?.let { path ->
+                    val file = java.io.File(path)
+                    if (file.exists()) {
+                        binding.ivHomeAvatar.setImageURI(android.net.Uri.fromFile(file))
+                    }
+                }
+
             }
         }
+    }
+// thay đổi liên tục phần home
+    override fun onResume() {
+        super.onResume()
+
+        val userId =
+            SessionManager(
+                requireContext()
+            )
+                .getCurrentUserId()
+
+        loadUserInfo(
+            userId
+        )
     }
     override fun onDestroyView() {
 

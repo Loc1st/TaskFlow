@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(
     R.layout.fragment_home
@@ -69,8 +71,9 @@ class HomeFragment : Fragment(
             )
                 .getCurrentUserId()
 
-        binding.tvUserName.text =
-            "Lộc"
+        loadUserInfo(
+            userId
+        )
 
         setupUpcoming()
 
@@ -444,7 +447,38 @@ class HomeFragment : Fragment(
     }
 
 
+    private fun loadUserInfo(
+        userId: Int
+    ) {
 
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            val user =
+
+                DatabaseProvider
+                    .getDatabase(
+                        requireContext()
+                    )
+                    .userDao()
+                    .getUserById(
+                        userId
+                    )
+
+            user?.let {
+
+                binding.tvUserName.text =
+                    it.username
+
+                /*
+                 * Sau này thêm Avatar:
+                 *
+                 * Glide.with(this@HomeFragment)
+                 *     .load(it.avatarUrl)
+                 *     .into(binding.imgAvatar)
+                 */
+            }
+        }
+    }
     override fun onDestroyView() {
 
         super.onDestroyView()

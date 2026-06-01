@@ -4,25 +4,20 @@
     <item
         android:id="@+id/homeFragment"
         android:title="Home"
-        android:icon="@android:drawable/ic_menu_view"/>
+        android:icon="@drawable/ic_home"/>
+
+    <item
+        android:id="@+id/tasksFragment"
+        android:title="Tasks"
+        android:icon="@drawable/ic_tasks"/>
 
     <item
         android:id="@+id/calendarFragment"
         android:title="Calendar"
-        android:icon="@android:drawable/ic_menu_my_calendar"/>
-
-    <item
-        android:id="@+id/addTaskFragment"
-        android:title="Add"
-        android:icon="@android:drawable/ic_input_add"/>
-
-    <item
-        android:id="@+id/reminderFragment"
-        android:title="Reminder"
-        android:icon="@android:drawable/ic_lock_idle_alarm"/>
+        android:icon="@drawable/ic_calendar"/>
 
     <item
         android:id="@+id/profileFragment"
         android:title="Profile"
-        android:icon="@android:drawable/ic_menu_manage"/>
+        android:icon="@drawable/ic_profile"/>
 </menu>

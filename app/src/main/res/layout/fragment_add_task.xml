@@ -1,120 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_main"> <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/etTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:hint="Task Title"
+        android:background="@drawable/bg_edittext"
+        android:padding="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:layout_marginBottom="16dp" />
 
-        <EditText
-            android:id="@+id/etTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Task Title" />
+    <EditText
+        android:id="@+id/etDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description"
+        android:background="@drawable/bg_edittext"
+        android:padding="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:layout_marginBottom="16dp" />
 
-        <EditText
-            android:id="@+id/etDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Description" />
+    <EditText
+        android:id="@+id/etStartDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Start Date"
+        android:focusable="false"
+        android:clickable="true"
+        android:background="@drawable/bg_edittext"
+        android:padding="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+        android:layout_marginBottom="16dp" />
 
-        <!-- START DATE -->
-        <EditText
-            android:id="@+id/etStartDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Start Date"
-            android:focusable="false"
-            android:clickable="true"
-            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
-            android:paddingEnd="12dp" />
+    <EditText
+        android:id="@+id/etStartTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Start Time"
+        android:focusable="false"
+        android:clickable="true"
+        android:background="@drawable/bg_edittext"
+        android:padding="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:drawableEnd="@android:drawable/ic_lock_idle_alarm"
+        android:layout_marginBottom="16dp" />
 
-        <!-- START TIME -->
-        <EditText
-            android:id="@+id/etStartTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Start Time"
-            android:focusable="false"
-            android:clickable="true"
-            android:drawableEnd="@android:drawable/ic_lock_idle_alarm"
-            android:paddingEnd="12dp" />
+    <EditText
+        android:id="@+id/etEndDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="End Date"
+        android:focusable="false"
+        android:clickable="true"
+        android:background="@drawable/bg_edittext"
+        android:padding="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+        android:layout_marginBottom="16dp" />
 
-        <!-- END DATE -->
-        <EditText
-            android:id="@+id/etEndDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="End Date"
-            android:focusable="false"
-            android:clickable="true"
-            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
-            android:paddingEnd="12dp" />
+    <EditText
+        android:id="@+id/etEndTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="End Time"
+        android:focusable="false"
+        android:clickable="true"
+        android:background="@drawable/bg_edittext"
+        android:padding="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:drawableEnd="@android:drawable/ic_lock_idle_alarm"
+        android:layout_marginBottom="16dp" />
 
-        <!-- END TIME -->
-        <EditText
-            android:id="@+id/etEndTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="End Time"
-            android:focusable="false"
-            android:clickable="true"
-            android:drawableEnd="@android:drawable/ic_lock_idle_alarm"
-            android:paddingEnd="12dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Priority"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
 
-        <!-- PRIORITY -->
-        <TextView
+    <RadioGroup
+        android:id="@+id/rgPriority"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/rbLow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Priority"
-            android:textStyle="bold"
-            android:paddingTop="12dp" />
+            android:textColor="@color/text_primary"
+            android:text="Low" />
 
-        <RadioGroup
-            android:id="@+id/rgPriority"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rbLow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Low" />
-
-            <RadioButton
-                android:id="@+id/rbMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Medium" />
-
-            <RadioButton
-                android:id="@+id/rbHigh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="High" />
-        </RadioGroup>
-
-        <EditText
-            android:id="@+id/etCategory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Category" />
-
-        <CheckBox
-            android:id="@+id/cbReminder"
+        <RadioButton
+            android:id="@+id/rbMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enable Reminder" />
+            android:textColor="@color/text_primary"
+            android:text="Medium" />
 
-        <Button
-            android:id="@+id/btnSaveTask"
-            android:layout_width="match_parent"
+        <RadioButton
+            android:id="@+id/rbHigh"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save Task" />
+            android:textColor="@color/text_primary"
+            android:text="High" />
+    </RadioGroup>
 
-    </LinearLayout>
+    <EditText
+        android:id="@+id/etCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category"
+        android:background="@drawable/bg_edittext"
+        android:padding="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:layout_marginBottom="16dp" />
+
+    <CheckBox
+        android:id="@+id/cbReminder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_primary"
+        android:text="Enable Reminder"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btnSaveTask"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Save Task"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:backgroundTint="@color/primary_color"
+        app:cornerRadius="16dp" />
+
+</LinearLayout>
 </ScrollView>

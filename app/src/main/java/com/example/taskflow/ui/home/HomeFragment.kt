@@ -7,10 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentHomeBinding
-import com.example.taskflow.session.SessionManager
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -18,12 +15,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.navigation.fragment.findNavController
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-
+import com.example.taskflow.viewmodel.UserViewModel
+import androidx.fragment.app.activityViewModels
 class HomeFragment : Fragment(
     R.layout.fragment_home
 ) {
+
+
 
     private var _binding:
             FragmentHomeBinding? = null
@@ -34,20 +32,9 @@ class HomeFragment : Fragment(
     private lateinit var upcomingAdapter:
             UpcomingAdapter
 
-    private val viewModel:
-            TaskViewModel by viewModels {
-
-        TaskViewModelFactory(
-
-            TaskRepository(
-
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .taskDao()
-            )
-        )
+    private val userViewModel: UserViewModel by activityViewModels()
+    private val viewModel: TaskViewModel by viewModels {
+        TaskViewModelFactory()
     }
 
     override fun onViewCreated(
@@ -64,16 +51,17 @@ class HomeFragment : Fragment(
             FragmentHomeBinding.bind(
                 view
             )
+        userViewModel.loadCurrentUser()
 
-        val userId =
-            SessionManager(
-                requireContext()
-            )
-                .getCurrentUserId()
+        userViewModel.currentUser.observe(viewLifecycleOwner) { user ->
 
-        loadUserInfo(
-            userId
-        )
+            if (_binding == null) return@observe
+
+            binding.tvUserName.text =
+                user?.username ?: ""
+
+        }
+
 
         setupUpcoming()
 
@@ -85,21 +73,34 @@ class HomeFragment : Fragment(
                 Date()
             )
 
-        viewModel
-            .getTasksByDate(
-                userId,
-                today
-            )
-            .observe(
-                viewLifecycleOwner
-            ) { tasks ->
+        viewModel.listenTasks { tasks ->
+
+            if (!isAdded || _binding == null) return@listenTasks
+
+            activity?.runOnUiThread {
+
+                if (_binding == null) return@runOnUiThread
+
+                val today = SimpleDateFormat(
+                    "yyyy-MM-dd",
+                    Locale.getDefault()
+                ).format(Date())
+
+                val todayTasks =
+                    tasks.filter {
+
+                        it.startDate == today
+
+                    }
 
                 val total =
-                    tasks.size
+                    todayTasks.size
 
                 val done =
-                    tasks.count {
-                        it.isCompleted
+                    todayTasks.count {
+
+                        it.completed
+
                     }
 
                 binding.tvTodayProgress.text =
@@ -107,11 +108,12 @@ class HomeFragment : Fragment(
 
                 val percent =
 
-                    if (
-                        total == 0
-                    )
+                    if (total == 0)
+
                         0
+
                     else
+
                         done * 100 / total
 
                 binding.tvPercent.text =
@@ -120,113 +122,74 @@ class HomeFragment : Fragment(
                 binding.circleProgress.progress =
                     percent
 
-
-
                 upcomingAdapter.update(
 
-                    tasks
+                    todayTasks
+
                         .sortedBy {
+
                             it.endTime
+
                         }
+
                         .take(3)
+
                 )
 
+                val highTasks = tasks.filter {
+                    it.priority.equals("High", true)
+                }
 
+                val mediumTasks = tasks.filter {
+                    it.priority.equals("Medium", true)
+                }
 
+                val lowTasks = tasks.filter {
+                    it.priority.equals("Low", true)
+                }
 
+                val highPercent =
+                    if (highTasks.isEmpty())
+                        0
+                    else
+                        highTasks.count { it.completed } * 100 / highTasks.size
 
+                val mediumPercent =
+                    if (mediumTasks.isEmpty())
+                        0
+                    else
+                        mediumTasks.count { it.completed } * 100 / mediumTasks.size
 
-            }
-        viewModel
-            .getTasksByUser(
-                userId
-            )
-            .observe(
-                viewLifecycleOwner
-            ) { tasks ->
-
-                val highTasks =
-                    tasks.filter {
-                        it.priority.trim()
-                            .equals(
-                                "high",
-                                true
-                            )
-                    }
-
-                val highCompleted =
-                    highTasks.count {
-                        it.isCompleted
-                    }
+                val lowPercent =
+                    if (lowTasks.isEmpty())
+                        0
+                    else
+                        lowTasks.count { it.completed } * 100 / lowTasks.size
 
                 bindPriorityCard(
                     binding.cardHigh.root,
                     "CAO",
                     highTasks.size,
-
-                    if (highTasks.isEmpty())
-                        0
-                    else
-                        highCompleted * 100 /
-                                highTasks.size
+                    highPercent
                 )
-
-
-
-                val mediumTasks =
-                    tasks.filter {
-                        it.priority.trim()
-                            .equals(
-                                "medium",
-                                true
-                            )
-                    }
-
-                val mediumCompleted =
-                    mediumTasks.count {
-                        it.isCompleted
-                    }
 
                 bindPriorityCard(
                     binding.cardMedium.root,
                     "TRUNG BÌNH",
                     mediumTasks.size,
-
-                    if (mediumTasks.isEmpty())
-                        0
-                    else
-                        mediumCompleted * 100 /
-                                mediumTasks.size
+                    mediumPercent
                 )
-
-
-
-                val lowTasks =
-                    tasks.filter {
-                        it.priority.trim()
-                            .equals(
-                                "low",
-                                true
-                            )
-                    }
-
-                val lowCompleted =
-                    lowTasks.count {
-                        it.isCompleted
-                    }
 
                 bindPriorityCard(
                     binding.cardLow.root,
                     "THẤP",
                     lowTasks.size,
-
-                    if (lowTasks.isEmpty())
-                        0
-                    else
-                        lowCompleted * 100 /
-                                lowTasks.size
+                    lowPercent
                 )
+
             }
+
+        }
 
         binding.btnViewCalendar
             .setOnClickListener {
@@ -307,7 +270,7 @@ class HomeFragment : Fragment(
                 val bundle =
                     Bundle()
 
-                bundle.putInt(
+                bundle.putString(
                     "taskId",
                     task.id
                 )
@@ -447,65 +410,15 @@ class HomeFragment : Fragment(
     }
 
 
-    private fun loadUserInfo(
-        userId: Int
-    ) {
 
-        viewLifecycleOwner.lifecycleScope.launch {
 
-            val user =
 
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .userDao()
-                    .getUserById(
-                        userId
-                    )
-
-            user?.let {
-
-                binding.tvUserName.text =
-                    it.username
-
-                /*
-                 * Sau này thêm Avatar:
-                 *
-                 * Glide.with(this@HomeFragment)
-                 *     .load(it.avatarUrl)
-                 *     .into(binding.imgAvatar)
-                 */
-                //đã thêm phần avatar rồi
-                it.avatarPath?.let { path ->
-                    val file = java.io.File(path)
-                    if (file.exists()) {
-                        binding.ivHomeAvatar.setImageURI(android.net.Uri.fromFile(file))
-                    }
-                }
-
-            }
-        }
-    }
-// thay đổi liên tục phần home
-    override fun onResume() {
-        super.onResume()
-
-        val userId =
-            SessionManager(
-                requireContext()
-            )
-                .getCurrentUserId()
-
-        loadUserInfo(
-            userId
-        )
-    }
     override fun onDestroyView() {
+
+        viewModel.stopListening()
 
         super.onDestroyView()
 
-        _binding =
-            null
+        _binding = null
     }
-    }
+}

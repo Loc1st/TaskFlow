@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.navigation.safeargs)
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -84,20 +86,6 @@ dependencies {
     // COROUTINE
     // =========================
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-
-    // =========================
-    // ROOM DATABASE
-    // =========================
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
-
-    // =========================
-    // RETROFIT
-    // =========================
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-
     // =========================
     // OKHTTP LOGGING
     // =========================
@@ -134,5 +122,17 @@ dependencies {
     androidTestImplementation(
         "androidx.test.espresso:espresso-core:3.6.1"
     )
+
+    // Firebase BOM
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+
+// Firebase Authentication
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+// Cloud Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+// Firebase Storage
+    implementation("com.google.firebase:firebase-storage-ktx")
 
 }

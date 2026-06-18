@@ -7,16 +7,16 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.taskflow.R
-import com.example.taskflow.data.local.entity.TaskEntity
 import com.example.taskflow.databinding.ItemReminderBinding
+import com.example.taskflow.data.firebase.model.FirebaseTask
 
 class ReminderAdapter(
 
     private var tasks:
-    List<TaskEntity> = emptyList(),
+    List<FirebaseTask> = emptyList(),
 
     private val onClick:
-        (TaskEntity) -> Unit
+        (FirebaseTask) -> Unit
 
 ) : RecyclerView.Adapter<
         ReminderAdapter.ViewHolder>() {
@@ -204,7 +204,7 @@ class ReminderAdapter(
     fun updateTasks(
 
         newTasks:
-        List<TaskEntity>
+        List<FirebaseTask>
 
     ) {
 

@@ -7,12 +7,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.local.entity.TaskEntity
-import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentTaskDetailBinding
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
+import com.example.taskflow.data.firebase.model.FirebaseTask
+import com.example.taskflow.notification.ReminderScheduler
 
 class TaskDetailFragment :
     Fragment(
@@ -27,22 +26,13 @@ class TaskDetailFragment :
         get() = _binding!!
 
     private var currentTask:
-            TaskEntity? = null
+            FirebaseTask? = null
 
     private val viewModel:
             TaskViewModel by viewModels {
 
-        TaskViewModelFactory(
+        TaskViewModelFactory()
 
-            TaskRepository(
-
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .taskDao()
-            )
-        )
     }
 
     override fun onViewCreated(
@@ -60,9 +50,9 @@ class TaskDetailFragment :
                 .bind(view)
 
         val taskId =
-            arguments?.getInt(
+            arguments?.getString(
                 "taskId"
-            ) ?: -1
+            ) ?: ""
 
         binding.btnBack
             .setOnClickListener {
@@ -71,29 +61,21 @@ class TaskDetailFragment :
                     .navigateUp()
             }
 
-        viewModel.getTaskById(
-            taskId
-        ) { task ->
+        viewModel.listenTasks { tasks ->
 
-            if (task == null) {
+            if (!isAdded || _binding == null) return@listenTasks
 
-                Toast.makeText(
-                    requireContext(),
-                    "Không tìm thấy công việc",
-                    Toast.LENGTH_SHORT
-                ).show()
+            val task = tasks.find {
 
-                return@getTaskById
-            }
+                it.id == taskId
 
-            currentTask =
-                task
+            } ?: return@listenTasks
 
-            binding.tvTitle.text =
-                task.title
+            currentTask = task
 
-            binding.tvDescription.text =
-                task.description
+            binding.tvTitle.text = task.title
+
+            binding.tvDescription.text = task.description
 
             binding.tvStart.text =
                 "📅 Bắt đầu\n${task.startDate} • ${task.startTime}"
@@ -102,147 +84,129 @@ class TaskDetailFragment :
                 "⏰ Kết thúc\n${task.endDate} • ${task.endTime}"
 
             binding.tvCategory.text =
-                "📂 Danh mục\n${
-                    when(task.category.lowercase()) {
+                "📂 Danh mục\n${task.category}"
 
-                        "study" -> "Học tập"
+            when (task.priority.lowercase()) {
 
-                        "work" -> "Công việc"
+                "high" -> {
 
-                        "personal" -> "Cá nhân"
-
-                        else -> task.category
-                    }
-                }"
-
-            when (
-                task.priority.lowercase()
-            ) {
-
-                "low" -> {
-
-                    binding.tvPriority.text =
-                        "THẤP"
-
-                    binding.tvPriority.setBackgroundResource(
-                        R.drawable.bg_priority_low
-                    )
-
-                    binding.tvPriority.setTextColor(
-                        android.graphics.Color.parseColor(
-                            "#2EB872"
-                        )
-                    )
-                }
-
-                "medium" -> {
-
-                    binding.tvPriority.text =
-                        "TRUNG BÌNH"
-
-                    binding.tvPriority.setBackgroundResource(
-                        R.drawable.bg_priority_medium
-                    )
-
-                    binding.tvPriority.setTextColor(
-                        requireContext().getColor(
-                            R.color.group_orange
-                        )
-                    )
-                }
-
-                else -> {
-
-                    binding.tvPriority.text =
-                        "CAO"
-
+                    binding.tvPriority.text = "CAO"
                     binding.tvPriority.setBackgroundResource(
                         R.drawable.bg_priority_high
                     )
 
-                    binding.tvPriority.setTextColor(
-                        android.graphics.Color.parseColor(
-                            "#FF4D4D"
-                        )
-                    )
                 }
+
+                "medium" -> {
+
+                    binding.tvPriority.text = "TRUNG BÌNH"
+                    binding.tvPriority.setBackgroundResource(
+                        R.drawable.bg_priority_medium
+                    )
+
+                }
+
+                else -> {
+
+                    binding.tvPriority.text = "THẤP"
+                    binding.tvPriority.setBackgroundResource(
+                        R.drawable.bg_priority_low
+                    )
+
+                }
+
             }
 
-            updateButton(
-                task
-            )
+            updateButton(task)
+
         }
 
 
-        binding.btnComplete
-            .setOnClickListener {
+        binding.btnComplete.setOnClickListener {
 
-                currentTask?.let {
+            currentTask?.let { task ->
 
-                    val updated =
+                if (!task.completed) {
 
-                        it.copy(
+                    ReminderScheduler(requireContext())
+                        .cancelReminder(task.id)
 
-                            isCompleted =
-                                !it.isCompleted,
+                }
 
-                            syncPending =
-                                true
-                        )
+                viewModel.updateTask(
 
-                    viewModel.updateTask(
-                        updated
+                    task.copy(
+
+                        completed = !task.completed
+
                     )
 
-                    Toast.makeText(
+                ) { success ->
 
-                        requireContext(),
+                    if (success) {
 
-                        if (
-                            updated.isCompleted
-                        )
-                            "Đã hoàn thành công việc"
-                        else
-                            "Đã chuyển sang chưa hoàn thành",
+                        Toast.makeText(
+                            requireContext(),
+                            "Đã cập nhật",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    }
 
-                    findNavController()
-                        .popBackStack()
                 }
+
             }
 
+        }
 
-        binding.btnDelete
-            .setOnClickListener {
 
-                currentTask?.let {
+        binding.btnDelete.setOnClickListener {
 
-                    viewModel.deleteTask(
-                        it
-                    )
+            currentTask?.let { task ->
 
-                    Toast.makeText(
-                        requireContext(),
-                        "Đã xóa công việc",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                // Hủy Alarm trước khi xóa Task
+                ReminderScheduler(requireContext())
+                    .cancelReminder(task.id)
 
-                    findNavController()
-                        .popBackStack()
+                viewModel.deleteTask(
+                    task.id
+                ) { success ->
+
+                    if (success) {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Đã xóa",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        findNavController().popBackStack()
+
+                    } else {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Xóa thất bại",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                    }
+
                 }
+
             }
+
+        }
     }
 
     private fun updateButton(
-        task: TaskEntity
+        task: FirebaseTask
     ) {
 
         binding.btnComplete.text =
 
             if (
-                task.isCompleted
+                task.completed
             ) {
                 "Chưa hoàn thành"
             } else {
@@ -252,9 +216,10 @@ class TaskDetailFragment :
 
     override fun onDestroyView() {
 
+        viewModel.stopListening()
+
         super.onDestroyView()
 
-        _binding =
-            null
+        _binding = null
     }
 }

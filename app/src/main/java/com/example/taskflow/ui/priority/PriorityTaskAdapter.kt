@@ -3,16 +3,16 @@ package com.example.taskflow.ui.priority
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.taskflow.data.local.entity.TaskEntity
 import com.example.taskflow.databinding.ItemPriorityTaskBinding
 import com.example.taskflow.R
+import com.example.taskflow.data.firebase.model.FirebaseTask
 class PriorityTaskAdapter(
 
-    private var tasks: List<TaskEntity> =
+    private var tasks: List<FirebaseTask> =
         emptyList(),
 
     private val onClick:
-        (TaskEntity) -> Unit
+        (FirebaseTask) -> Unit
 
 ) : RecyclerView.Adapter<
         PriorityTaskAdapter.ViewHolder>() {
@@ -83,7 +83,7 @@ class PriorityTaskAdapter(
         holder.binding.tvDate.text =
             task.endDate
 
-        if (task.isCompleted) {
+        if (task.completed) {
 
             holder.binding.tvStatus.text =
                 "ĐÃ HOÀN THÀNH"
@@ -116,7 +116,7 @@ class PriorityTaskAdapter(
     }
 
     fun update(
-        newTasks: List<TaskEntity>
+        newTasks: List<FirebaseTask>
     ) {
 
         tasks = newTasks

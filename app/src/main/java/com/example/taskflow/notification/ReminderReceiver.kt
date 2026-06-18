@@ -6,16 +6,19 @@ import android.content.Intent
 
 class ReminderReceiver : BroadcastReceiver() {
 
+
     override fun onReceive(
         context: Context,
         intent: Intent
     ) {
 
+        android.util.Log.d(
+            "REMINDER",
+            "Receiver called"
+        )
+
         val taskId =
-            intent.getIntExtra(
-                "task_id",
-                -1
-            )
+            intent.getStringExtra("task_id") ?: ""
 
         val title =
             intent.getStringExtra(
@@ -28,14 +31,12 @@ class ReminderReceiver : BroadcastReceiver() {
             ) ?: "You have a task to do."
 
         val helper =
-            NotificationHelper(
-                context
-            )
+            NotificationHelper(context)
 
         helper.createNotificationChannel()
 
         helper.showTaskReminder(
-            taskId = taskId,
+            taskId = taskId.hashCode(),
             title = title,
             description = description
         )

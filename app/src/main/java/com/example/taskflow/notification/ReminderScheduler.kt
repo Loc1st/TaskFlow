@@ -10,7 +10,7 @@ class ReminderScheduler(
 ) {
 
     fun scheduleReminder(
-        taskId: Int,
+        taskId: String,
         title: String,
         description: String,
         triggerTimeMillis: Long
@@ -35,21 +35,51 @@ class ReminderScheduler(
         val pendingIntent =
             PendingIntent.getBroadcast(
                 context,
-                taskId,
+                taskId.hashCode(),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT
                         or PendingIntent.FLAG_IMMUTABLE
             )
 
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            triggerTimeMillis,
-            pendingIntent
+
+        android.util.Log.d(
+            "REMINDER",
+            "Alarm: $triggerTimeMillis"
         )
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+
+            if (alarmManager.canScheduleExactAlarms()) {
+
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTimeMillis,
+                    pendingIntent
+                )
+
+            } else {
+
+                android.util.Log.e(
+                    "REMINDER",
+                    "Exact alarm permission denied"
+                )
+
+            }
+
+        } else {
+
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerTimeMillis,
+                pendingIntent
+            )
+
+        }
+
     }
 
     fun cancelReminder(
-        taskId: Int
+        taskId: String
     ) {
         val alarmManager =
             context.getSystemService(
@@ -64,7 +94,7 @@ class ReminderScheduler(
         val pendingIntent =
             PendingIntent.getBroadcast(
                 context,
-                taskId,
+                taskId.hashCode(),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT
                         or PendingIntent.FLAG_IMMUTABLE

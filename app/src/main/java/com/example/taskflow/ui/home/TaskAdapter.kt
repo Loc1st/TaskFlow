@@ -3,11 +3,10 @@ package com.example.taskflow.ui.home
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.taskflow.data.local.entity.TaskEntity
-
+import com.example.taskflow.data.firebase.model.FirebaseTask
 class TaskAdapter(
-    private var taskList: List<TaskEntity>,
-    private val onClick: (TaskEntity) -> Unit
+    private var taskList: List<FirebaseTask>,
+    private val onClick: (FirebaseTask) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(
@@ -53,7 +52,7 @@ class TaskAdapter(
     }
 
     fun updateTasks(
-        newTasks: List<TaskEntity>
+        newTasks: List<FirebaseTask>
     ) {
         taskList = newTasks
         notifyDataSetChanged()

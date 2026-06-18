@@ -10,10 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.taskflow.R
 import com.example.taskflow.session.SessionManager
+import com.google.firebase.auth.FirebaseAuth
 
 class SplashFragment : Fragment() {
 
-    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,10 +36,7 @@ class SplashFragment : Fragment() {
             savedInstanceState
         )
 
-        sessionManager =
-            SessionManager(
-                requireContext()
-            )
+
 
         Handler(
             Looper.getMainLooper()
@@ -59,7 +56,7 @@ class SplashFragment : Fragment() {
                 return@postDelayed
             }
 
-            if (sessionManager.isLoggedIn()) {
+            if (FirebaseAuth.getInstance().currentUser != null) {
 
                 navController.navigate(
                     R.id.action_splashFragment_to_homeFragment

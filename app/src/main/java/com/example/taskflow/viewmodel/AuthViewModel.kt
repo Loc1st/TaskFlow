@@ -1,51 +1,79 @@
 package com.example.taskflow.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.taskflow.data.local.entity.UserEntity
-import com.example.taskflow.data.repository.UserRepository
-import kotlinx.coroutines.launch
+import com.example.taskflow.data.firebase.FirebaseAuthRepository
+import com.example.taskflow.data.firebase.FirebaseUserRepository
 
-class AuthViewModel(
-    private val userRepository: UserRepository
-) : ViewModel() {
+class AuthViewModel : ViewModel() {
 
-    fun registerUser(
-        user: UserEntity,
-        onResult: (Long) -> Unit
-    ) {
-        viewModelScope.launch {
-            val result =
-                userRepository.registerUser(user)
-            onResult(result)
-        }
-    }
+    private val authRepository =
+        FirebaseAuthRepository()
+
+    private val userRepository =
+        FirebaseUserRepository()
 
     fun login(
         email: String,
         password: String,
-        onResult: (UserEntity?) -> Unit
+        onResult: (Boolean, String?) -> Unit
     ) {
-        viewModelScope.launch {
-            val user =
-                userRepository.login(
-                    email,
-                    password
-                )
-            onResult(user)
+
+        authRepository.login(
+            email,
+            password
+        ) { success, message ->
+
+            onResult(
+                success,
+                message
+            )
+
         }
+
     }
 
-    fun checkEmailExists(
+    fun register(
+        username: String,
         email: String,
-        onResult: (Boolean) -> Unit
+        password: String,
+        onResult: (Boolean, String?) -> Unit
     ) {
-        viewModelScope.launch {
-            val user =
-                userRepository.getUserByEmail(
-                    email
+
+        authRepository.register(
+            username = username,
+            email = email,
+            password = password
+        ) { success, message ->
+
+            if (!success) {
+
+                onResult(
+                    false,
+                    message
                 )
-            onResult(user != null)
+
+                return@register
+            }
+
+            onResult(
+                success,
+                message
+            )
+
         }
+
     }
+
+    fun logout() {
+
+        authRepository.logout()
+
+    }
+
+    fun isLoggedIn(): Boolean {
+
+        return authRepository.isLoggedIn()
+
+    }
+
 }

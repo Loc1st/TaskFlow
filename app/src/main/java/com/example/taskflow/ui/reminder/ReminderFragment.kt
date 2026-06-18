@@ -6,14 +6,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.local.entity.TaskEntity
-import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentReminderBinding
-import com.example.taskflow.session.SessionManager
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
 import java.time.LocalDate
+import com.example.taskflow.data.firebase.model.FirebaseTask
 
 class ReminderFragment : Fragment(
     R.layout.fragment_reminder
@@ -36,20 +33,8 @@ class ReminderFragment : Fragment(
             ReminderAdapter
 
 
-    private val viewModel:
-            TaskViewModel by viewModels {
-
-        TaskViewModelFactory(
-
-            TaskRepository(
-
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .taskDao()
-            )
-        )
+    private val viewModel: TaskViewModel by viewModels {
+        TaskViewModelFactory()
     }
 
 
@@ -72,27 +57,22 @@ class ReminderFragment : Fragment(
         setupRecyclerViews()
 
 
-        val userId =
-
-            SessionManager(
-                requireContext()
-            )
-                .getCurrentUserId()
 
 
-        viewModel
-            .getPendingTasks(
-                userId
-            )
-            .observe(
-                viewLifecycleOwner
-            ) { tasks ->
 
-                loadReminderTasks(
-                    tasks
-                )
+            viewModel.listenTasks { tasks ->
+
+                if (!isAdded || _binding == null) return@listenTasks
+
+                activity?.runOnUiThread {
+
+                    if (!isAdded || _binding == null) return@runOnUiThread
+
+                    loadReminderTasks(tasks)
+                }
             }
-    }
+
+        }
 
 
     private fun setupRecyclerViews() {
@@ -135,7 +115,7 @@ class ReminderFragment : Fragment(
 
 
     private fun loadReminderTasks(
-        tasks: List<TaskEntity>
+        tasks: List<FirebaseTask>
     ) {
 
         val today =
@@ -150,7 +130,7 @@ class ReminderFragment : Fragment(
             tasks.filter {
 
                 it.reminderEnabled &&
-                        !it.isCompleted
+                        !it.completed
             }
 
 
@@ -253,8 +233,11 @@ class ReminderFragment : Fragment(
 
     override fun onDestroyView() {
 
+        viewModel.stopListening()
+
         super.onDestroyView()
 
         _binding = null
+
     }
 }

@@ -8,12 +8,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentPriorityTasksBinding
-import com.example.taskflow.session.SessionManager
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
+import com.example.taskflow.data.firebase.model.FirebaseTask
 
 class PriorityTasksFragment : Fragment(
     R.layout.fragment_priority_tasks
@@ -30,20 +28,8 @@ class PriorityTasksFragment : Fragment(
             PriorityTaskAdapter
 
 
-    private val viewModel:
-            TaskViewModel by viewModels {
-
-        TaskViewModelFactory(
-
-            TaskRepository(
-
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .taskDao()
-            )
-        )
+    private val viewModel: TaskViewModel by viewModels {
+        TaskViewModelFactory()
     }
 
 
@@ -101,7 +87,7 @@ class PriorityTasksFragment : Fragment(
                 val bundle =
                     Bundle()
 
-                bundle.putInt(
+                bundle.putString(
                     "taskId",
                     task.id
                 )
@@ -126,31 +112,35 @@ class PriorityTasksFragment : Fragment(
 
 
 
-        val userId =
-
-            SessionManager(
-                requireContext()
-            )
-                .getCurrentUserId()
 
 
 
-        viewModel
-            .getTasksByPriority(
-                userId,
-                priority
-            )
-            .observe(
-                viewLifecycleOwner
-            ) { tasks ->
+
+        viewModel.listenTasks { tasks ->
+
+            requireActivity().runOnUiThread {
+
+                val priorityTasks =
+
+                    tasks.filter {
+
+                        it.priority.equals(
+                            priority,
+                            true
+                        )
+
+                    }
 
                 binding.tvTaskCount.text =
-                    "${tasks.size} công việc"
+                    "${priorityTasks.size} công việc"
 
                 adapter.update(
-                    tasks
+                    priorityTasks
                 )
+
             }
+
+        }
 
     }
 

@@ -6,11 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.taskflow.R
-import com.example.taskflow.data.local.entity.TaskEntity
-
+import com.example.taskflow.data.firebase.model.FirebaseTask
 class CalendarTaskAdapter(
-    private var taskList: List<TaskEntity>,
-    private val onClick: (TaskEntity) -> Unit
+    private var taskList: List<FirebaseTask>,
+    private val onClick: (FirebaseTask) -> Unit
 ) : RecyclerView.Adapter<CalendarTaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(
@@ -101,7 +100,7 @@ class CalendarTaskAdapter(
             "Kết thúc:  ${task.endDate} • ${task.endTime}"
 
         // STATUS
-        if (task.isCompleted) {
+        if (task.completed) {
 
             holder.tvStatus.text =
                 "Hoàn thành"
@@ -145,7 +144,7 @@ class CalendarTaskAdapter(
     }
 
     fun updateTasks(
-        newTasks: List<TaskEntity>
+        newTasks: List<FirebaseTask>
     ) {
         taskList = newTasks
         notifyDataSetChanged()

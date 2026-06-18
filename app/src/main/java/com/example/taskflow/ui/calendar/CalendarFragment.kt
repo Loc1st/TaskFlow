@@ -7,19 +7,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentCalendarBinding
-import com.example.taskflow.session.SessionManager
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
-import com.example.taskflow.data.local.entity.TaskEntity
-
+import com.example.taskflow.data.firebase.model.FirebaseTask
 class CalendarFragment : Fragment(
     R.layout.fragment_calendar
 ) {
@@ -36,21 +31,11 @@ class CalendarFragment : Fragment(
     private lateinit var dateAdapter:
             DateAdapter
 
-    private val viewModel:
-            TaskViewModel by viewModels {
-
-        TaskViewModelFactory(
-            TaskRepository(
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .taskDao()
-            )
-        )
+    private val viewModel: TaskViewModel by viewModels {
+        TaskViewModelFactory()
     }
 
-    private var allTasks = emptyList<TaskEntity>()
+    private var allTasks = emptyList<FirebaseTask>()
 
     override fun onViewCreated(
         view: View,
@@ -75,7 +60,7 @@ class CalendarFragment : Fragment(
                 val bundle =
                     Bundle()
 
-                bundle.putInt(
+                bundle.putString(
                     "taskId",
                     task.id
                 )
@@ -97,11 +82,7 @@ class CalendarFragment : Fragment(
             .adapter =
             adapter
 
-        val userId =
-            SessionManager(
-                requireContext()
-            )
-                .getCurrentUserId()
+
 
         val dateList =
             mutableListOf<DateModel>()
@@ -147,25 +128,22 @@ class CalendarFragment : Fragment(
         }
 
         dateAdapter =
-            DateAdapter(
-                dateList
-            ) { selectedDate ->
+            DateAdapter(dateList) { selectedDate ->
 
-                viewModel
-                    .getTasksByDate(
-                        userId,
-                        selectedDate.date
-                    )
-                    .observe(
-                        viewLifecycleOwner
-                    ) { tasks ->
+                viewModel.listenTasks { tasks ->
 
-                        allTasks = tasks
+                    if (!isAdded || _binding == null) return@listenTasks
 
-                        adapter.updateTasks(
-                            tasks
-                        )
+                    allTasks = tasks.filter {
+
+                        it.startDate == selectedDate.date
+
                     }
+
+                    adapter.updateTasks(allTasks)
+
+                }
+
             }
 
         val layoutManager =
@@ -199,21 +177,20 @@ class CalendarFragment : Fragment(
                     Date()
                 )
 
-        viewModel
-            .getTasksByDate(
-                userId,
-                today
-            )
-            .observe(
-                viewLifecycleOwner
-            ) { tasks ->
+        viewModel.listenTasks { tasks ->
 
-                allTasks = tasks
+            if (!isAdded || _binding == null) return@listenTasks
 
-                adapter.updateTasks(
-                    tasks
-                )
-            }
+            allTasks =
+                tasks.filter {
+
+                    it.startDate == today
+
+                }
+
+            adapter.updateTasks(allTasks)
+
+        }
 
 
 
@@ -240,7 +217,7 @@ class CalendarFragment : Fragment(
 
                 allTasks.filter {
 
-                    !it.isCompleted
+                    !it.completed
                 }
             )
         }
@@ -257,7 +234,7 @@ class CalendarFragment : Fragment(
 
                 allTasks.filter {
 
-                    it.isCompleted
+                    it.completed
                 }
             )
         }
@@ -314,6 +291,16 @@ class CalendarFragment : Fragment(
                     )
                 )
         }
+    }
+
+    override fun onDestroyView() {
+
+        viewModel.stopListening()
+
+        super.onDestroyView()
+
+        _binding = null
+
     }
 
 }

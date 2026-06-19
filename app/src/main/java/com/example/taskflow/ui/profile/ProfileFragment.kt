@@ -123,7 +123,14 @@ class ProfileFragment : Fragment(
             authRepository.logout()
 
             findNavController().navigate(
-                R.id.action_profileFragment_to_loginFragment
+                R.id.loginFragment,
+                null,
+                androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(
+                        R.id.nav_graph,
+                        true
+                    )
+                    .build()
             )
         }
     }

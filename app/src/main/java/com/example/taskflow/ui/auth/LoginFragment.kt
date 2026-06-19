@@ -77,7 +77,14 @@ class LoginFragment : Fragment() {
                 if (success) {
 
                     findNavController().navigate(
-                        R.id.action_loginFragment_to_homeFragment
+                        R.id.homeFragment,
+                        null,
+                        androidx.navigation.NavOptions.Builder()
+                            .setPopUpTo(
+                                R.id.loginFragment,
+                                true
+                            )
+                            .build()
                     )
 
                 } else {

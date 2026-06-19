@@ -124,7 +124,7 @@
             android:layout_height="68dp"
             android:layout_marginTop="18dp"
             android:background="@drawable/bg_button_delete"
-            android:text="🗑 DELETE TASK"
+            android:text="XÓA TASK"
             android:textColor="#FF4B4B"
             android:textStyle="bold"
             android:textSize="16sp"

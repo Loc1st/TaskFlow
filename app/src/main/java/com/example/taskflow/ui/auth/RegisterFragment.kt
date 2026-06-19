@@ -6,34 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.local.entity.UserEntity
-import com.example.taskflow.data.repository.UserRepository
 import com.example.taskflow.databinding.FragmentRegisterBinding
-import com.example.taskflow.viewmodel.AuthViewModel
-import com.example.taskflow.viewmodel.AuthViewModelFactory
-
+import com.example.taskflow.data.firebase.FirebaseAuthRepository
 class RegisterFragment : Fragment() {
 
     private var _binding:
             FragmentRegisterBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel:
-            AuthViewModel by viewModels {
-        AuthViewModelFactory(
-            UserRepository(
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .userDao()
-            )
-        )
-    }
+    private val authRepository =
+        FirebaseAuthRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,50 +87,48 @@ class RegisterFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-                viewModel.checkEmailExists(
-                    email
-                ) { exists ->
+                authRepository.register(
 
-                    if (exists) {
+                    username = name,
+
+                    email = email,
+
+                    password = password
+
+                ) { success, message ->
+
+                    if (success) {
+
                         Toast.makeText(
-                            requireContext(),
-                            "Email already exists",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@checkEmailExists
-                    }
 
-                    val user =
-                        UserEntity(
-                            username = name,
-                            email = email,
-                            password = password
+                            requireContext(),
+
+                            "Đăng ký thành công",
+
+                            Toast.LENGTH_SHORT
+
+                        ).show()
+
+                        findNavController().navigate(
+
+                            R.id.action_registerFragment_to_loginFragment
+
                         )
 
-                    viewModel.registerUser(
-                        user
-                    ) { result ->
+                    } else {
 
-                        if (result > 0) {
-                            Toast.makeText(
-                                requireContext(),
-                                "Register success",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        Toast.makeText(
 
-                            findNavController()
-                                .navigate(
-                                    R.id.action_registerFragment_to_loginFragment
-                                )
+                            requireContext(),
 
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Register failed",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                            message,
+
+                            Toast.LENGTH_SHORT
+
+                        ).show()
+
                     }
+
                 }
             }
     }

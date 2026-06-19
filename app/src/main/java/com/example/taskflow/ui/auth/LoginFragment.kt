@@ -9,31 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.repository.UserRepository
 import com.example.taskflow.databinding.FragmentLoginBinding
-import com.example.taskflow.session.SessionManager
-import com.example.taskflow.viewmodel.AuthViewModel
-import com.example.taskflow.viewmodel.AuthViewModelFactory
-
+import com.example.taskflow.data.firebase.FirebaseAuthRepository
 class LoginFragment : Fragment() {
 
     private var _binding:
             FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel:
-            AuthViewModel by viewModels {
-        AuthViewModelFactory(
-            UserRepository(
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .userDao()
-            )
-        )
-    }
+    private val authRepository = FirebaseAuthRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,67 +41,75 @@ class LoginFragment : Fragment() {
             view,
             savedInstanceState
         )
+        android.util.Log.d(
+            "AUTH",
+            FirebaseAuthRepository().getCurrentUid() ?: "NULL"
+        )
 
-        binding.btnLogin
-            .setOnClickListener {
+        binding.btnLogin.setOnClickListener {
 
-                val email =
-                    binding.etEmail.text
-                        .toString()
-                        .trim()
+            val email =
+                binding.etEmail.text
+                    .toString()
+                    .trim()
 
-                val password =
-                    binding.etPassword.text
-                        .toString()
-                        .trim()
+            val password =
+                binding.etPassword.text
+                    .toString()
+                    .trim()
 
-                if (
-                    email.isEmpty() ||
-                    password.isEmpty()
-                ) {
+            if (email.isEmpty() || password.isEmpty()) {
+
+                Toast.makeText(
+                    requireContext(),
+                    "Fill all fields",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            authRepository.login(
+                email,
+                password
+            ) { success, message ->
+
+                if (success) {
+
+                    findNavController().navigate(
+                        R.id.homeFragment,
+                        null,
+                        androidx.navigation.NavOptions.Builder()
+                            .setPopUpTo(
+                                R.id.loginFragment,
+                                true
+                            )
+                            .build()
+                    )
+
+                } else {
+
                     Toast.makeText(
                         requireContext(),
-                        "Fill all fields",
+                        message,
                         Toast.LENGTH_SHORT
                     ).show()
-                    return@setOnClickListener
+
                 }
 
-                viewModel.login(
-                    email,
-                    password
-                ) { user ->
-
-                    if (user != null) {
-
-                        SessionManager(
-                            requireContext()
-                        ).saveLoginSession(
-                            user.id
-                        )
-
-                        findNavController()
-                            .navigate(
-                                R.id.action_loginFragment_to_homeFragment
-                            )
-
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Invalid account",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
             }
 
-        binding.tvRegister
-            .setOnClickListener {
-                findNavController()
-                    .navigate(
-                        R.id.action_loginFragment_to_registerFragment
-                    )
-            }
+        }
+
+        binding.tvRegister.setOnClickListener {
+
+            findNavController().navigate(
+                R.id.action_loginFragment_to_registerFragment
+            )
+
+        }
+
+
     }
 
     override fun onDestroyView() {

@@ -1,109 +1,83 @@
 package com.example.taskflow.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.taskflow.data.local.entity.TaskEntity
+import com.example.taskflow.data.firebase.model.FirebaseTask
 import com.example.taskflow.data.repository.TaskRepository
-import kotlinx.coroutines.launch
+import com.google.firebase.firestore.ListenerRegistration
 
 class TaskViewModel(
-    private val taskRepository: TaskRepository
+    private val repository: TaskRepository
 ) : ViewModel() {
 
+    private var listener:
+            ListenerRegistration? = null
+
     fun addTask(
-        task: TaskEntity,
-        onResult: (Long) -> Unit
+        task: FirebaseTask,
+        onResult: (Boolean, FirebaseTask?) -> Unit
     ) {
-        viewModelScope.launch {
-            val id =
-                taskRepository.addTask(task)
-            onResult(id)
-        }
+
+        repository.addTask(
+            task,
+            onResult
+        )
+
     }
 
     fun updateTask(
-        task: TaskEntity
+        task: FirebaseTask,
+        onResult: (Boolean) -> Unit
     ) {
-        viewModelScope.launch {
-            taskRepository.updateTask(task)
-        }
+
+        repository.updateTask(
+            task,
+            onResult
+        )
+
     }
 
     fun deleteTask(
-        task: TaskEntity
+        taskId: String,
+        onResult: (Boolean) -> Unit
     ) {
-        viewModelScope.launch {
-            taskRepository.deleteTask(task)
-        }
-    }
 
-    fun getTasksByUser(
-        userId: Int
-    ): LiveData<List<TaskEntity>> {
-        return taskRepository.getTasksByUser(
-            userId
+        repository.deleteTask(
+            taskId,
+            onResult
         )
+
     }
 
-    fun getTasksByDate(
-        userId: Int,
-        date: String
-    ): LiveData<List<TaskEntity>> {
-        return taskRepository.getTasksByDate(
-            userId,
-            date
-        )
-    }
+    fun listenTasks(
 
-    fun getPendingTasks(
-        userId: Int
-    ): LiveData<List<TaskEntity>> {
-        return taskRepository.getPendingTasks(
-            userId
-        )
-    }
+        onChanged:
+            (List<FirebaseTask>) -> Unit
 
-    fun getCompletedTasks(
-        userId: Int
-    ): LiveData<List<TaskEntity>> {
-        return taskRepository.getCompletedTasks(
-            userId
-        )
-    }
+    ) {
 
-    fun getTasksByPriority(
-        userId: Int,
-        priority: String
-    ): LiveData<List<TaskEntity>> {
+        listener?.remove()
 
-        return taskRepository
-            .getTasksByPriority(
-                userId,
-                priority
+        listener =
+            repository.listenTasks(
+                onChanged
             )
+
     }
 
-    fun markTaskCompleted(
-        task: TaskEntity
-    ) {
-        viewModelScope.launch {
-            taskRepository.markTaskCompleted(
-                task
-            )
-        }
+    override fun onCleared() {
+
+        listener?.remove()
+
+        super.onCleared()
+
     }
 
-    fun getTaskById(
-        taskId: Int,
-        onResult: (TaskEntity?) -> Unit
-    ) {
-        viewModelScope.launch {
-            val task =
-                taskRepository.getTaskById(
-                    taskId
-                )
-            onResult(task)
-        }
+    fun stopListening() {
+
+        listener?.remove()
+
+        listener = null
+
     }
+
 }

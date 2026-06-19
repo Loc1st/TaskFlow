@@ -10,15 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.local.entity.TaskEntity
-import com.example.taskflow.data.repository.TaskRepository
+import com.example.taskflow.data.firebase.model.FirebaseTask
 import com.example.taskflow.databinding.FragmentAddTaskBinding
-import com.example.taskflow.session.SessionManager
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
 import java.util.Calendar
-
+import com.example.taskflow.notification.DateTimeUtil
+import com.example.taskflow.notification.ReminderScheduler
 class AddTaskFragment : Fragment(
     R.layout.fragment_add_task
 ) {
@@ -27,209 +25,277 @@ class AddTaskFragment : Fragment(
     private val binding get() = _binding!!
 
     private val viewModel: TaskViewModel by viewModels {
-        TaskViewModelFactory(
-            TaskRepository(
-                DatabaseProvider
-                    .getDatabase(requireContext())
-                    .taskDao()
-            )
-        )
+        TaskViewModelFactory()
     }
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
     ) {
-        super.onViewCreated(
-            view,
-            savedInstanceState
-        )
 
-        _binding =
-            FragmentAddTaskBinding.bind(view)
+        super.onViewCreated(view, savedInstanceState)
+
+        _binding = FragmentAddTaskBinding.bind(view)
 
         setupDatePickers()
+
         setupTimePickers()
 
         binding.btnSaveTask.setOnClickListener {
 
-            val title =
-                binding.etTitle.text
-                    .toString()
-                    .trim()
+            saveTask()
 
-            val description =
-                binding.etDescription.text
-                    .toString()
-                    .trim()
-
-            val startDate =
-                binding.etStartDate.text
-                    .toString()
-                    .trim()
-
-            val startTime =
-                binding.etStartTime.text
-                    .toString()
-                    .trim()
-
-            val endDate =
-                binding.etEndDate.text
-                    .toString()
-                    .trim()
-
-            val endTime =
-                binding.etEndTime.text
-                    .toString()
-                    .trim()
-
-            val category =
-                binding.etCategory.text
-                    .toString()
-                    .trim()
-
-            val reminder =
-                binding.cbReminder.isChecked
-
-            val priority = when (
-                binding.rgPriority.checkedRadioButtonId
-            ) {
-                R.id.rbLow -> "Low"
-                R.id.rbMedium -> "Medium"
-                R.id.rbHigh -> "High"
-                else -> "Low"
-            }
-
-            if (title.isEmpty()) {
-                Toast.makeText(
-                    requireContext(),
-                    "Title required",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            }
-
-            val userId =
-                SessionManager(
-                    requireContext()
-                ).getCurrentUserId()
-
-            val task =
-                TaskEntity(
-                    userId = userId,
-                    title = title,
-                    description = description,
-                    startDate = startDate,
-                    startTime = startTime,
-                    endDate = endDate,
-                    endTime = endTime,
-                    priority = priority,
-                    category = category,
-                    reminderEnabled = reminder,
-                    isCompleted = false,
-                    syncPending = true
-                )
-
-            viewModel.addTask(task) { id ->
-                if (id > 0) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Task added",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    findNavController()
-                        .popBackStack()
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Save failed",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
         }
+
+    }
+
+    private fun saveTask() {
+
+        val title =
+            binding.etTitle.text.toString().trim()
+
+        if (title.isEmpty()) {
+
+            Toast.makeText(
+                requireContext(),
+                "Nhập tiêu đề",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+
+        }
+
+        val priority = when (
+            binding.rgPriority.checkedRadioButtonId
+        ) {
+
+            R.id.rbHigh -> "High"
+
+            R.id.rbMedium -> "Medium"
+
+            else -> "Low"
+
+        }
+
+        val task = FirebaseTask(
+
+            title = title,
+
+            description =
+                binding.etDescription.text.toString(),
+
+            startDate =
+                binding.etStartDate.text.toString(),
+
+            startTime =
+                binding.etStartTime.text.toString(),
+
+            endDate =
+                binding.etEndDate.text.toString(),
+
+            endTime =
+                binding.etEndTime.text.toString(),
+
+            category =
+                binding.etCategory.text.toString(),
+
+            priority = priority,
+
+            reminderEnabled =
+                binding.cbReminder.isChecked,
+
+            completed = false
+
+        )
+
+        viewModel.addTask(task) { success, savedTask ->
+
+            if (success && savedTask != null) {
+
+                if (savedTask.reminderEnabled) {
+
+                    val triggerTime =
+
+                        DateTimeUtil.toMillis(
+
+                            savedTask.endDate,
+
+                            savedTask.endTime
+
+                        )
+
+                    if (triggerTime > System.currentTimeMillis()) {
+
+                        ReminderScheduler(requireContext())
+                            .scheduleReminder(
+
+                                taskId = savedTask.id,
+
+                                title = savedTask.title,
+
+                                description = savedTask.description,
+
+                                triggerTimeMillis = triggerTime
+
+                            )
+                            android.util.Log.d(
+                                "REMINDER",
+                                "Schedule success ${savedTask.title}"
+                            )
+
+                    }
+
+                }
+
+                Toast.makeText(
+
+                    requireContext(),
+
+                    "Đã thêm công việc",
+
+                    Toast.LENGTH_SHORT
+
+                ).show()
+
+                findNavController().popBackStack()
+
+            } else {
+
+                Toast.makeText(
+
+                    requireContext(),
+
+                    "Lưu thất bại",
+
+                    Toast.LENGTH_SHORT
+
+                ).show()
+
+            }
+
+        }
+
     }
 
     private fun setupDatePickers() {
+
         binding.etStartDate.setOnClickListener {
-            showDatePicker(
-                binding.etStartDate
-            )
+
+            showDatePicker(binding.etStartDate)
+
         }
 
         binding.etEndDate.setOnClickListener {
-            showDatePicker(
-                binding.etEndDate
-            )
+
+            showDatePicker(binding.etEndDate)
+
         }
+
     }
 
     private fun setupTimePickers() {
+
         binding.etStartTime.setOnClickListener {
-            showTimePicker(
-                binding.etStartTime
-            )
+
+            showTimePicker(binding.etStartTime)
+
         }
 
         binding.etEndTime.setOnClickListener {
-            showTimePicker(
-                binding.etEndTime
-            )
+
+            showTimePicker(binding.etEndTime)
+
         }
+
     }
 
     private fun showDatePicker(
         target: EditText
     ) {
+
         val calendar =
             Calendar.getInstance()
 
         DatePickerDialog(
+
             requireContext(),
+
             { _, year, month, day ->
-                val date =
+
+                target.setText(
+
                     String.format(
+
                         "%04d-%02d-%02d",
+
                         year,
+
                         month + 1,
+
                         day
+
                     )
 
-                target.setText(date)
+                )
+
             },
+
             calendar.get(Calendar.YEAR),
+
             calendar.get(Calendar.MONTH),
+
             calendar.get(Calendar.DAY_OF_MONTH)
+
         ).show()
+
     }
 
     private fun showTimePicker(
         target: EditText
     ) {
+
         val calendar =
             Calendar.getInstance()
 
         TimePickerDialog(
+
             requireContext(),
+
             { _, hour, minute ->
-                val time =
+
+                target.setText(
+
                     String.format(
+
                         "%02d:%02d",
+
                         hour,
+
                         minute
+
                     )
 
-                target.setText(time)
+                )
+
             },
+
             calendar.get(Calendar.HOUR_OF_DAY),
+
             calendar.get(Calendar.MINUTE),
+
             true
+
         ).show()
+
     }
 
     override fun onDestroyView() {
+
         super.onDestroyView()
+
         _binding = null
+
     }
+
 }

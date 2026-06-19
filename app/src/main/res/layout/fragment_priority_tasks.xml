@@ -19,13 +19,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:text="HIGH PRIORITY"
+        android:text="ƯU TIÊN CAO"
 
         android:textSize="28sp"
 
         android:textStyle="bold"
 
         android:textColor="@color/text_primary"/>
+
+    <TextView
+        android:id="@+id/tvTaskCount"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="6dp"
+
+        android:text="0 công việc"
+
+        android:textSize="14sp"
+
+        android:textColor="@color/text_secondary"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp"
+
+        android:background="#E8E8E8"/>
 
 
     <androidx.recyclerview.widget.RecyclerView

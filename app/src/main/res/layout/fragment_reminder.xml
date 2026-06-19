@@ -1,21 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reminder Tasks"
-        android:textSize="24sp"
-        android:textStyle="bold"/>
+    android:background="@color/background_main">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvReminderTasks"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-</LinearLayout>
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical"
+
+        android:padding="20dp">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Nhắc nhở"
+
+            android:textSize="28sp"
+
+            android:textStyle="bold"
+
+            android:textColor="@color/text_primary"/>
+
+
+        <TextView
+            android:id="@+id/tvReminderCount"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="4dp"
+
+            android:text="Bạn có 0 công việc sắp đến hạn"
+
+            android:textColor="@color/text_secondary"
+
+            android:textSize="14sp"/>
+
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="18dp"
+
+            app:cardCornerRadius="24dp"
+
+            app:cardElevation="0dp"
+
+            app:cardBackgroundColor="@color/group_purple_light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="🔔 Đừng bỏ lỡ việc quan trọng"
+
+                    android:textStyle="bold"
+
+                    android:textSize="16sp"
+
+                    android:textColor="@color/group_purple"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="6dp"
+
+                    android:text="TaskFlow sẽ nhắc bạn trước khi công việc đến hạn."
+
+                    android:textSize="13sp"
+
+                    android:textColor="@color/text_secondary"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- HÔM NAY -->
+
+        <TextView
+            android:id="@+id/tvToday"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="24dp"
+
+            android:text="Hôm nay"
+
+            android:textSize="20sp"
+
+            android:textStyle="bold"
+
+            android:textColor="@color/text_primary"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvToday"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:nestedScrollingEnabled="false"/>
+
+
+
+        <!-- NGÀY MAI -->
+
+        <TextView
+            android:id="@+id/tvTomorrow"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="20dp"
+
+            android:text="Ngày mai"
+
+            android:textSize="20sp"
+
+            android:textStyle="bold"
+
+            android:textColor="@color/text_primary"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTomorrow"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:nestedScrollingEnabled="false"/>
+
+
+
+        <!-- SẮP TỚI -->
+
+        <TextView
+            android:id="@+id/tvUpcoming"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="20dp"
+
+            android:text="Sắp tới"
+
+            android:textSize="20sp"
+
+            android:textStyle="bold"
+
+            android:textColor="@color/text_primary"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvUpcoming"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:nestedScrollingEnabled="false"/>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -2,33 +2,22 @@ package com.example.taskflow.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.taskflow.R
-import com.example.taskflow.data.local.entity.TaskEntity
+import com.example.taskflow.data.firebase.model.FirebaseTask
 import com.example.taskflow.databinding.ItemUpcomingTaskBinding
 
 class UpcomingAdapter(
 
-    private var tasks:
-    List<TaskEntity> =
-        emptyList(),
+    private var tasks: List<FirebaseTask> = emptyList(),
 
-    private val onClick:
-        (TaskEntity) -> Unit
+    private val onClick: (FirebaseTask) -> Unit
 
-) : RecyclerView.Adapter<
-        UpcomingAdapter.ViewHolder>() {
-
+) : RecyclerView.Adapter<UpcomingAdapter.ViewHolder>() {
 
     class ViewHolder(
-        val binding:
-        ItemUpcomingTaskBinding
-    ) :
-        RecyclerView.ViewHolder(
-            binding.root
-        )
-
+        val binding: ItemUpcomingTaskBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -39,21 +28,19 @@ class UpcomingAdapter(
 
             ItemUpcomingTaskBinding.inflate(
 
-                LayoutInflater.from(
-                    parent.context
-                ),
+                LayoutInflater.from(parent.context),
 
                 parent,
 
                 false
+
             )
+
         )
+
     }
 
-
-    override fun getItemCount() =
-        tasks.size
-
+    override fun getItemCount() = tasks.size
 
     override fun onBindViewHolder(
 
@@ -63,140 +50,106 @@ class UpcomingAdapter(
 
     ) {
 
-        val task =
-            tasks[position]
-
-
+        val task = tasks[position]
 
         holder.binding.tvTitle.text =
             task.title
 
-        holder.binding.tvPriority.text =
-            task.priority.uppercase()
+        when (task.priority.lowercase()) {
 
-        holder.binding.tvDeadline.text =
-            task.endTime
+            "high" -> {
 
+                holder.binding.tvPriority.text = "CAO"
 
+                holder.binding.tvPriority.setTextColor(
 
-        when (
-            task.priority.lowercase()
-        ) {
+                    holder.itemView.context.getColor(
 
-            "low" -> {
+                        android.R.color.holo_red_dark
 
-                holder.binding.root
-                    .setBackgroundColor(
-
-                        ContextCompat.getColor(
-
-                            holder.itemView.context,
-
-                            R.color.status_todo_bg
-                        )
                     )
 
-                holder.binding.tvPriority
-                    .setTextColor(
+                )
 
-                        ContextCompat.getColor(
+                holder.binding.root.setBackgroundResource(
+                    R.drawable.bg_task_high
+                )
 
-                            holder.itemView.context,
-
-                            R.color.status_todo_text
-                        )
-                    )
             }
-
-
 
             "medium" -> {
 
-                holder.binding.root
-                    .setBackgroundColor(
+                holder.binding.tvPriority.text = "TRUNG BÌNH"
 
-                        ContextCompat.getColor(
+                holder.binding.tvPriority.setTextColor(
 
-                            holder.itemView.context,
+                    holder.itemView.context.getColor(
 
-                            R.color.status_in_progress_bg
-                        )
+                        R.color.status_in_progress_text
+
                     )
 
-                holder.binding.tvPriority
-                    .setTextColor(
+                )
 
-                        ContextCompat.getColor(
+                holder.binding.root.setBackgroundResource(
+                    R.drawable.bg_task_medium
+                )
 
-                            holder.itemView.context,
-
-                            R.color.status_in_progress_text
-                        )
-                    )
             }
-
-
 
             else -> {
 
-                holder.binding.root
-                    .setBackgroundColor(
+                holder.binding.tvPriority.text = "THẤP"
 
-                        ContextCompat.getColor(
+                holder.binding.tvPriority.setTextColor(
 
-                            holder.itemView.context,
+                    holder.itemView.context.getColor(
 
-                            R.color.group_pink_light
-                        )
+                        R.color.status_todo_text
+
                     )
 
-                holder.binding.tvPriority
-                    .setTextColor(
+                )
 
-                        ContextCompat.getColor(
+                holder.binding.root.setBackgroundResource(
+                    R.drawable.bg_task_low
+                )
 
-                            holder.itemView.context,
-
-                            android.R.color.holo_red_dark
-                        )
-                    )
             }
+
         }
 
-
+        holder.binding.tvDeadline.text =
+            "⏰ Kết thúc: ${task.endTime}"
 
         holder.binding.pbProgress.progress =
 
-            if (
-                task.isCompleted
-            )
+            if (task.completed)
+
                 100
+
             else
+
                 50
 
         holder.itemView.setOnClickListener {
 
-            onClick(
-                task
-            )
+            onClick(task)
+
         }
+
     }
-
-
-
-
 
     fun update(
-        newTasks:
-        List<TaskEntity>
+
+        newTasks: List<FirebaseTask>
+
     ) {
 
-        tasks =
-            newTasks
+        tasks = newTasks
 
         notifyDataSetChanged()
+
     }
-
-
 
 }

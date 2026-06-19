@@ -51,14 +51,13 @@ class DateAdapter(
 
         val item = dates[position]
 
+        val date =
+            LocalDate.parse(
+                item.date
+            )
+
         val month =
-            LocalDate
-                .parse(item.date)
-                .month
-                .getDisplayName(
-                    java.time.format.TextStyle.SHORT,
-                    java.util.Locale.getDefault()
-                )
+            "Th${date.monthValue}"
 
         holder.tvMonth.text = month
 

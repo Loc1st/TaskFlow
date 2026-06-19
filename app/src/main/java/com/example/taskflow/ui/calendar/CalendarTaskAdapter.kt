@@ -6,11 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.taskflow.R
-import com.example.taskflow.data.local.entity.TaskEntity
-
+import com.example.taskflow.data.firebase.model.FirebaseTask
 class CalendarTaskAdapter(
-    private var taskList: List<TaskEntity>,
-    private val onClick: (TaskEntity) -> Unit
+    private var taskList: List<FirebaseTask>,
+    private val onClick: (FirebaseTask) -> Unit
 ) : RecyclerView.Adapter<CalendarTaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(
@@ -55,7 +54,17 @@ class CalendarTaskAdapter(
 
         // PRIORITY
         holder.tvCategory.text =
-            task.priority.uppercase()
+
+            when(task.priority.lowercase()) {
+
+                "high" -> "CAO"
+
+                "medium" -> "TRUNG BÌNH"
+
+                "low" -> "THẤP"
+
+                else -> task.priority
+            }
 
         when (task.priority.lowercase()) {
 
@@ -88,13 +97,13 @@ class CalendarTaskAdapter(
             task.title
 
         holder.tvTime.text =
-            task.startTime
+            "Kết thúc:  ${task.endDate} • ${task.endTime}"
 
         // STATUS
-        if (task.isCompleted) {
+        if (task.completed) {
 
             holder.tvStatus.text =
-                "Done"
+                "Hoàn thành"
 
             holder.tvStatus.setTextColor(
                 holder.itemView.context.getColor(
@@ -109,7 +118,7 @@ class CalendarTaskAdapter(
         } else {
 
             holder.tvStatus.text =
-                "To-do"
+                "Chưa hoàn thành"
 
             holder.tvStatus.setTextColor(
                 holder.itemView.context.getColor(
@@ -135,7 +144,7 @@ class CalendarTaskAdapter(
     }
 
     fun updateTasks(
-        newTasks: List<TaskEntity>
+        newTasks: List<FirebaseTask>
     ) {
         taskList = newTasks
         notifyDataSetChanged()

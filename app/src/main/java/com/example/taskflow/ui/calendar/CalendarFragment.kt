@@ -7,18 +7,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflow.R
-import com.example.taskflow.data.local.db.DatabaseProvider
-import com.example.taskflow.data.repository.TaskRepository
 import com.example.taskflow.databinding.FragmentCalendarBinding
-import com.example.taskflow.session.SessionManager
 import com.example.taskflow.viewmodel.TaskViewModel
 import com.example.taskflow.viewmodel.TaskViewModelFactory
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
-
+import com.example.taskflow.data.firebase.model.FirebaseTask
 class CalendarFragment : Fragment(
     R.layout.fragment_calendar
 ) {
@@ -35,19 +31,11 @@ class CalendarFragment : Fragment(
     private lateinit var dateAdapter:
             DateAdapter
 
-    private val viewModel:
-            TaskViewModel by viewModels {
-
-        TaskViewModelFactory(
-            TaskRepository(
-                DatabaseProvider
-                    .getDatabase(
-                        requireContext()
-                    )
-                    .taskDao()
-            )
-        )
+    private val viewModel: TaskViewModel by viewModels {
+        TaskViewModelFactory()
     }
+
+    private var allTasks = emptyList<FirebaseTask>()
 
     override fun onViewCreated(
         view: View,
@@ -72,7 +60,7 @@ class CalendarFragment : Fragment(
                 val bundle =
                     Bundle()
 
-                bundle.putInt(
+                bundle.putString(
                     "taskId",
                     task.id
                 )
@@ -94,11 +82,7 @@ class CalendarFragment : Fragment(
             .adapter =
             adapter
 
-        val userId =
-            SessionManager(
-                requireContext()
-            )
-                .getCurrentUserId()
+
 
         val dateList =
             mutableListOf<DateModel>()
@@ -124,11 +108,18 @@ class CalendarFragment : Fragment(
                             .toString(),
 
                     dayName =
-                        date.dayOfWeek
-                            .getDisplayName(
-                                TextStyle.SHORT,
-                                Locale.getDefault()
-                            ),
+                        when (date.dayOfWeek.value) {
+
+                            1 -> "T2"
+                            2 -> "T3"
+                            3 -> "T4"
+                            4 -> "T5"
+                            5 -> "T6"
+                            6 -> "T7"
+                            7 -> "CN"
+
+                            else -> ""
+                        },
 
                     isSelected =
                         i == 0
@@ -137,23 +128,22 @@ class CalendarFragment : Fragment(
         }
 
         dateAdapter =
-            DateAdapter(
-                dateList
-            ) { selectedDate ->
+            DateAdapter(dateList) { selectedDate ->
 
-                viewModel
-                    .getTasksByDate(
-                        userId,
-                        selectedDate.date
-                    )
-                    .observe(
-                        viewLifecycleOwner
-                    ) { tasks ->
+                viewModel.listenTasks { tasks ->
 
-                        adapter.updateTasks(
-                            tasks
-                        )
+                    if (!isAdded || _binding == null) return@listenTasks
+
+                    allTasks = tasks.filter {
+
+                        it.startDate == selectedDate.date
+
                     }
+
+                    adapter.updateTasks(allTasks)
+
+                }
+
             }
 
         val layoutManager =
@@ -187,26 +177,130 @@ class CalendarFragment : Fragment(
                     Date()
                 )
 
-        viewModel
-            .getTasksByDate(
-                userId,
-                today
-            )
-            .observe(
-                viewLifecycleOwner
-            ) { tasks ->
+        viewModel.listenTasks { tasks ->
 
-                adapter.updateTasks(
-                    tasks
+            if (!isAdded || _binding == null) return@listenTasks
+
+            allTasks =
+                tasks.filter {
+
+                    it.startDate == today
+
+                }
+
+            adapter.updateTasks(allTasks)
+
+        }
+
+
+
+        binding.btnAll.setOnClickListener {
+
+            selectFilter(
+                binding.btnAll
+            )
+
+            adapter.updateTasks(
+                allTasks
+            )
+        }
+
+
+
+        binding.btnTodo.setOnClickListener {
+
+            selectFilter(
+                binding.btnTodo
+            )
+
+            adapter.updateTasks(
+
+                allTasks.filter {
+
+                    !it.completed
+                }
+            )
+        }
+
+
+
+        binding.btnDone.setOnClickListener {
+
+            selectFilter(
+                binding.btnDone
+            )
+
+            adapter.updateTasks(
+
+                allTasks.filter {
+
+                    it.completed
+                }
+            )
+        }
+
+    }
+
+    private fun selectFilter(
+        selected: View
+    ) {
+
+        val buttons = listOf(
+            binding.btnAll,
+            binding.btnTodo,
+            binding.btnDone
+        )
+
+        buttons.forEach {
+
+            it.setBackgroundResource(
+                R.drawable.bg_filter_normal
+            )
+
+            it.setTextColor(
+                requireContext().getColor(
+                    R.color.primary_color
                 )
-            }
+            )
+        }
+
+        selected.setBackgroundResource(
+            R.drawable.bg_filter_selected
+        )
+
+        when(selected) {
+
+            binding.btnAll ->
+                binding.btnAll.setTextColor(
+                    requireContext().getColor(
+                        R.color.white
+                    )
+                )
+
+            binding.btnTodo ->
+                binding.btnTodo.setTextColor(
+                    requireContext().getColor(
+                        R.color.white
+                    )
+                )
+
+            binding.btnDone ->
+                binding.btnDone.setTextColor(
+                    requireContext().getColor(
+                        R.color.white
+                    )
+                )
+        }
     }
 
     override fun onDestroyView() {
 
+        viewModel.stopListening()
+
         super.onDestroyView()
 
         _binding = null
+
     }
 
 }
